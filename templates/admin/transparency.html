@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}الشفافية - لوحة الأدمن{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-chart-line"></i> الشفافية - تقارير الصندوق
+            <span class="badge bg-danger ms-2">للأدمن فقط</span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <i class="fas fa-hand-holding-usd fa-2x"></i>
+                        <h3 id="total-donations">0</h3>
+                        <p>إجمالي التبرعات</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <i class="fas fa-chart-line fa-2x"></i>
+                        <h3 id="total-expenses">0</h3>
+                        <p>إجمالي المصاريف</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-card text-center">
+                        <i class="fas fa-coins fa-2x"></i>
+                        <h3 id="balance">0</h3>
+                        <p>الرصيد الحالي</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">آخر التبرعات</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>التاريخ</th>
+                                            <th>المتبرع</th>
+                                            <th>المبلغ</th>
+                                            <th>الحالة</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="donations-list">
+                                        <tr><td colspan="4" class="text-center">جاري التحميل...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header">آخر المصاريف</div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>التاريخ</th>
+                                            <th>البيان</th>
+                                            <th>المبلغ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expenses-list">
+                                        <tr><td colspan="3" class="text-center">جاري التحميل...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+fetch('/admin/api/transparency-data')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('total-donations').textContent = formatCurrency(data.total_donations || 0);
+        document.getElementById('total-expenses').textContent = formatCurrency(data.total_expenses || 0);
+        document.getElementById('balance').textContent = formatCurrency((data.total_donations || 0) - (data.total_expenses || 0));
+        
+        const donationsList = document.getElementById('donations-list');
+        if (data.donations && data.donations.length > 0) {
+            donationsList.innerHTML = data.donations.map(d => `
+                <tr>
+                    <td>${formatDate(d.created_at)}</td>
+                    <td>${d.user_name || 'مستخدم'}</td>
+                    <td>${formatCurrency(d.amount)}</td>
+                    <td><span class="badge bg-success">مقبول</span></td>
+                </tr>
+            `).join('');
+        } else {
+            donationsList.innerHTML = '<tr><td colspan="4" class="text-center">لا توجد تبرعات</td></tr>';
+        }
+        
+        const expensesList = document.getElementById('expenses-list');
+        if (data.expenses && data.expenses.length > 0) {
+            expensesList.innerHTML = data.expenses.map(e => `
+                <tr>
+                    <td>${formatDate(e.created_at)}</td>
+                    <td>${e.title}</td>
+                    <td>${formatCurrency(e.amount)}</td>
+                </tr>
+            `).join('');
+        } else {
+            expensesList.innerHTML = '<tr><td colspan="3" class="text-center">لا توجد مصاريف</td></tr>';
+        }
+    })
+    .catch(err => {
+        console.error('Error loading transparency data:', err);
+    });
+</script>
+{% endblock %}
