@@ -45,9 +45,8 @@ def create_app():
     seed_reference_data(app)
     seed_admin(app)
     
-    # إنشاء جدول reset_codes
+    # إنشاء الجداول باستخدام SQLAlchemy
     with app.app_context():
-        # إنشاء الجداول باستخدام SQLAlchemy
         db.create_all()
         
         # أيضاً إنشاء جدول reset_codes يدوياً للتوافق
@@ -101,11 +100,10 @@ def create_app():
 def load_user(user_id):
     """تحميل المستخدم لـ Flask-Login"""
     from .models import User
-    from .db import get_db
     import flask
     
     try:
-        # محاولة استخدام SQLAlchemy أولاً
+        # استخدام SQLAlchemy أولاً
         user = User.query.get(int(user_id))
         if user:
             return user
@@ -114,6 +112,7 @@ def load_user(user_id):
     
     # استخدام قاعدة البيانات المباشرة
     try:
+        from .db import get_db
         db = get_db(flask.current_app)
         user_data = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
         if user_data:
