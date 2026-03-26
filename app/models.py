@@ -12,7 +12,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(200), nullable=False)
     email = db.Column(db.String(100))
     telegram_id = db.Column(db.Integer, unique=True)
-    role = db.Column(db.String(20), default='user')  # user, admin, super_admin
+    role = db.Column(db.String(20), default='user')
     college = db.Column(db.String(100))
     specialization = db.Column(db.String(100))
     monthly_donation = db.Column(db.Float, default=0)
@@ -20,7 +20,6 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # العلاقات
     donations = db.relationship('Donation', backref='user', lazy=True)
     
     def __repr__(self):
@@ -35,15 +34,12 @@ class Donation(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
     receipt_path = db.Column(db.String(200))
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    status = db.Column(db.String(20), default='pending')
     notes = db.Column(db.Text)
     is_monthly = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     reviewed_at = db.Column(db.DateTime)
     reviewed_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
-    def __repr__(self):
-        return f'<Donation {self.amount} by user {self.user_id}>'
 
 
 class Expense(db.Model):
@@ -56,14 +52,11 @@ class Expense(db.Model):
     category = db.Column(db.String(50))
     description = db.Column(db.Text)
     receipt_path = db.Column(db.String(200))
-    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
-    family_id = db.Column(db.Integer, db.ForeignKey('families.id'))  # اختياري للربط بالأسر
+    status = db.Column(db.String(20), default='pending')
+    family_id = db.Column(db.Integer, db.ForeignKey('families.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     approved_at = db.Column(db.DateTime)
     approved_by = db.Column(db.Integer, db.ForeignKey('users.id'))
-    
-    def __repr__(self):
-        return f'<Expense {self.title} - {self.amount}>'
 
 
 class Martyr(db.Model):
@@ -81,11 +74,7 @@ class Martyr(db.Model):
     family_id = db.Column(db.Integer, db.ForeignKey('families.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # العلاقات
     family = db.relationship('Family', backref='martyr', uselist=False)
-    
-    def __repr__(self):
-        return f'<Martyr {self.full_name}>'
 
 
 class Family(db.Model):
@@ -104,11 +93,7 @@ class Family(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # العلاقات
     support_history = db.relationship('FamilySupport', backref='family', lazy=True)
-    
-    def __repr__(self):
-        return f'<Family of martyr {self.martyr_id}>'
 
 
 class FamilySupport(db.Model):
@@ -118,7 +103,7 @@ class FamilySupport(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     family_id = db.Column(db.Integer, db.ForeignKey('families.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    type = db.Column(db.String(50))  # monthly, one_time, emergency
+    type = db.Column(db.String(50))
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, db.ForeignKey('users.id'))
@@ -133,9 +118,6 @@ class ResetCode(db.Model):
     code = db.Column(db.String(6), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     expires_at = db.Column(db.DateTime, nullable=False)
-    
-    def __repr__(self):
-        return f'<ResetCode for user {self.user_id}>'
 
 
 class Notification(db.Model):
@@ -146,12 +128,9 @@ class Notification(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     title = db.Column(db.String(200), nullable=False)
     message = db.Column(db.Text, nullable=False)
-    type = db.Column(db.String(50))  # donation, expense, system, broadcast
+    type = db.Column(db.String(50))
     is_read = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<Notification {self.title}>'
 
 
 class AuditLog(db.Model):
@@ -166,6 +145,3 @@ class AuditLog(db.Model):
     details = db.Column(db.Text)
     ip_address = db.Column(db.String(45))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<AuditLog {self.action} by user {self.user_id}>'
