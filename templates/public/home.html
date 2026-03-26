@@ -1,16 +1,51 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - صندوق الدفعة 109{% endblock %}
+
 {% block content %}
-<section class="hero card">
-  <h1>منصة إدارة تبرعات صندوق الدفعة 109</h1>
-  <p>تسجيل سريع، رفع إيصال، متابعة حالة التبرع، ولوحة إدارة مالية وتقارير وتشغيل جاهز.</p>
-  <div class="actions">
-    <a class="btn" href="{{ url_for('auth.register') }}">إنشاء حساب</a>
-    <a class="btn secondary" href="{{ url_for('auth.login') }}">تسجيل الدخول</a>
-  </div>
-</section>
-<section class="grid three">
-  <div class="card stat"><strong>{{ stats.donations_total|egp }}</strong><span>إجمالي التبرعات</span></div>
-  <div class="card stat"><strong>{{ stats.expenses_total|egp }}</strong><span>إجمالي المصاريف</span></div>
-  <div class="card stat"><strong>{{ stats.net_total|egp }}</strong><span>صافي الصندوق</span></div>
-</section>
-{% endblock %}
+<!-- Hero Section -->
+<div class="hero text-center py-5">
+    <h1 class="display-4">صندوق دعم الدفعة 109</h1>
+    <p class="lead">نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('auth.donate') }}" class="btn btn-primary btn-lg mt-3">
+            <i class="fas fa-hand-holding-heart"></i> تبرع الآن
+        </a>
+    {% endif %}
+</div>
+
+<!-- Features Section -->
+<div class="row mt-5">
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
+                <h3>تبرع الآن</h3>
+                <p>ساهم في دعم الأسر المحتاجة والشهداء من خلال تبرعاتك</p>
+                <a href="{{ url_for('auth.donate') }}" class="btn btn-primary">تبرع</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-star-of-life fa-3x text-primary mb-3"></i>
+                <h3>الشهداء</h3>
+                <p>تعرف على أسماء وصور الشهداء ودعم أسرهم</p>
+                <a href="{{ url_for('auth.martyrs') }}" class="btn btn-outline-primary">عرض الشهداء</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                <h3>التقارير</h3>
+                <p>عرض تقارير التبرعات والمصاريف</p>
+                <a href="{{ url_for('auth.reports') }}" class="btn btn-outline-primary">عرض التقارير</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- رسالة للمستخدمين الع
