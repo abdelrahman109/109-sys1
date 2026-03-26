@@ -56,6 +56,11 @@ def create_app():
     def _bootstrap():
         load_current_user(app)
         ensure_csrf_token()
+        # للتصحيح - طباعة حالة المستخدم
+        if hasattr(g, 'current_user') and g.current_user:
+            print(f"Before request - User loaded: {g.current_user.full_name}")
+        else:
+            print("Before request - No user loaded")
 
     @app.after_request
     def add_security_headers(response):
@@ -95,12 +100,19 @@ def load_user(user_id):
     from .db import get_db
     import flask
     
+    print(f"load_user called with user_id: {user_id}")
+    
     try:
         db = get_db(flask.current_app)
         user_data = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        
         if user_data:
-            return User(user_data)
+            user = User(user_data)
+            print(f"User loaded successfully: {user.full_name} (ID: {user.id})")
+            return user
+        else:
+            print(f"No user found with ID: {user_id}")
     except Exception as e:
-        print(f"Error loading user: {e}")
+        print(f"Error in load_user: {e}")
     
     return None
