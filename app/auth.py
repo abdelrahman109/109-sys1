@@ -91,7 +91,7 @@ def register():
             flash(f'حدث خطأ: {e}', 'danger')
             return redirect(url_for('auth.register'))
         
-        # تسجيل الدخول تلقائياً
+        # الحصول على المستخدم الجديد
         user_data = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
         from app.models import User
         user_obj = User(user_data)
