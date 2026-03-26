@@ -10,6 +10,54 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     
+    <style>
+        /* تنسيقات إضافية */
+        .btn-custom-login {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            border-radius: 25px;
+            padding: 6px 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-custom-login:hover {
+            background: white;
+            color: #0d6efd;
+            transform: translateY(-2px);
+        }
+        .btn-custom-register {
+            background: white;
+            border: 2px solid white;
+            color: #0d6efd;
+            border-radius: 25px;
+            padding: 6px 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-custom-register:hover {
+            background: transparent;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .navbar-toggler {
+            border: 2px solid white;
+            padding: 6px 10px;
+        }
+        .navbar-toggler-icon {
+            filter: brightness(0) invert(1);
+        }
+        @media (min-width: 992px) {
+            .navbar-expand-lg .navbar-collapse {
+                display: flex !important;
+                flex-basis: auto;
+            }
+            .navbar-toggler {
+                display: block !important;
+            }
+        }
+    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body>
@@ -19,24 +67,21 @@
                 <i class="fas fa-hand-holding-heart"></i> صندوق الدفعة 109
             </a>
             
-            <!-- أزرار دخول وتسجيل (تظهر دائماً) -->
             <div class="d-flex align-items-center gap-2">
                 {% if not current_user.is_authenticated %}
-                    <a href="/login" class="btn btn-outline-light btn-sm">
+                    <a href="/login" class="btn btn-custom-login">
                         <i class="fas fa-sign-in-alt"></i> دخول
                     </a>
-                    <a href="/register" class="btn btn-light btn-sm">
+                    <a href="/register" class="btn btn-custom-register">
                         <i class="fas fa-user-plus"></i> تسجيل
                     </a>
                 {% endif %}
                 
-                <!-- زر القائمة للموبايل -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="القائمة">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
             
-            <!-- القائمة المنسدلة (تظهر على الموبايل عند الضغط) -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
