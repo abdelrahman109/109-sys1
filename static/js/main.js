@@ -1,21 +1,28 @@
 // ==================== نظام دعم الدفعة 109 ====================
-// تأثيرات حركية متقدمة وتفاعلات عصرية
+// تفاعلات متقدمة وتجاوب كامل
 
-// تشغيل عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
-    // إضافة كلاس للـ navbar عند التمرير
-    const navbar = document.querySelector('.navbar');
-    if (navbar) {
-        window.addEventListener('scroll', function() {
-            if (window.scrollY > 50) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
+    // ==================== شريط التنقل للموبايل ====================
+    const navbarToggler = document.querySelector('.navbar-toggler');
+    const navLinks = document.querySelector('.nav-links');
+    
+    if (navbarToggler && navLinks) {
+        navbarToggler.addEventListener('click', function() {
+            navLinks.classList.toggle('active');
         });
     }
     
-    // إخفاء التنبيهات بتأثير حركي
+    // ==================== إغلاق القائمة عند النقر على رابط ====================
+    const navItems = document.querySelectorAll('.nav-links a');
+    navItems.forEach(function(item) {
+        item.addEventListener('click', function() {
+            if (window.innerWidth <= 768 && navLinks) {
+                navLinks.classList.remove('active');
+            }
+        });
+    });
+    
+    // ==================== إخفاء التنبيهات تلقائياً ====================
     const alerts = document.querySelectorAll('.alert');
     alerts.forEach(function(alert) {
         setTimeout(function() {
@@ -28,7 +35,65 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 5000);
     });
     
-    // تفعيل الـ tooltips
+    // ==================== التحقق من صحة النماذج ====================
+    const forms = document.querySelectorAll('form[data-validate="true"]');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(function(field) {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                    
+                    let errorDiv = field.nextElementSibling;
+                    if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback';
+                        errorDiv.textContent = 'هذا الحقل مطلوب';
+                        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                    }
+                } else {
+                    field.classList.remove('is-invalid');
+                    const errorDiv = field.nextElementSibling;
+                    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                event.preventDefault();
+                showMessage('يرجى تعبئة جميع الحقول المطلوبة', 'danger');
+            }
+        });
+        
+        form.querySelectorAll('[required]').forEach(function(field) {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                    const errorDiv = this.nextElementSibling;
+                    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+        });
+    });
+    
+    // ==================== تحريك الأرقام في الإحصائيات ====================
+    const statNumbers = document.querySelectorAll('.stat-card h3');
+    statNumbers.forEach(function(stat) {
+        const target = parseInt(stat.textContent.replace(/[^0-9]/g, ''));
+        if (target && target > 0) {
+            const originalText = stat.textContent;
+            stat.textContent = '0';
+            animateNumber(stat, 0, target, 1000, originalText);
+        }
+    });
+    
+    // ==================== تفعيل التلميحات ====================
     const tooltips = document.querySelectorAll('[data-toggle="tooltip"]');
     if (tooltips.length > 0 && typeof bootstrap !== 'undefined') {
         tooltips.forEach(function(tooltip) {
@@ -36,29 +101,56 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // إضافة تأثير ظهور تدريجي للعناصر
-    const elements = document.querySelectorAll('.card, .stat-card, .hero');
-    elements.forEach(function(el, index) {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        setTimeout(function() {
-            el.style.transition = 'all 0.6s ease';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
+    console.log('✅ نظام دعم الدفعة 109 جاهز');
 });
 
 // ==================== دوال مساعدة ====================
 
-// تأكيد الحذف مع تأثير
-function confirmDelete(message) {
-    return confirm(`⚠️ ${message || 'هل أنت متأكد من الحذف؟ هذا الإجراء لا يمكن التراجع عنه.'}`);
+// تحريك الأرقام
+function animateNumber(element, start, end, duration, originalText) {
+    if (!element) return;
+    let startTimestamp = null;
+    const isCurrency = originalText ? originalText.includes('ج') : false;
+    
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const value = Math.floor(progress * (end - start) + start);
+        
+        if (isCurrency) {
+            element.textContent = formatCurrency(value);
+        } else {
+            element.textContent = value.toLocaleString();
+        }
+        
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
 }
 
-// تأكيد العملية
-function confirmAction(message) {
-    return confirm(`❓ ${message || 'هل أنت متأكد من تنفيذ هذا الإجراء؟'}`);
+// عرض رسالة
+function showMessage(message, type = 'info', containerId = 'message-container') {
+    const container = document.getElementById(containerId);
+    if (container) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} fade-in-up`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button type="button" class="close" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        container.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateX(30px)';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    } else {
+        alert(message);
+    }
 }
 
 // تنسيق العملة
@@ -83,20 +175,6 @@ function formatDate(dateString) {
     });
 }
 
-// تنسيق التاريخ والوقت
-function formatDateTime(dateString) {
-    if (!dateString) return '-';
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) return dateString;
-    return date.toLocaleDateString('ar-EG', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
-}
-
 // التحقق من رقم الهاتف المصري
 function isValidPhone(phone) {
     return /^(010|011|012|015)[0-9]{8}$/.test(phone);
@@ -107,41 +185,65 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-// عرض رسالة نجاح
-function showSuccess(message, containerId = 'message-container') {
-    showMessage(message, 'success', containerId);
+// تأكيد الحذف
+function confirmDelete(message) {
+    return confirm(`⚠️ ${message || 'هل أنت متأكد من الحذف؟ هذا الإجراء لا يمكن التراجع عنه.'}`);
 }
 
-// عرض رسالة خطأ
-function showError(message, containerId = 'message-container') {
-    showMessage(message, 'danger', containerId);
+// تأكيد العملية
+function confirmAction(message) {
+    return confirm(`❓ ${message || 'هل أنت متأكد من تنفيذ هذا الإجراء؟'}`);
 }
 
-// عرض رسالة
-function showMessage(message, type, containerId) {
-    const container = document.getElementById(containerId);
-    if (container) {
-        const alert = document.createElement('div');
-        alert.className = `alert alert-${type} fade-in-up`;
-        alert.innerHTML = `
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
-            ${message}
-            <button type="button" class="close" onclick="this.parentElement.remove()">&times;</button>
-        `;
-        container.appendChild(alert);
-        
-        setTimeout(() => {
-            alert.style.opacity = '0';
-            alert.style.transform = 'translateX(30px)';
-            setTimeout(() => alert.remove(), 500);
-        }, 5000);
-    } else {
-        alert(message);
+// التحقق من رقم الهاتف (API)
+async function checkPhoneExists(phone) {
+    try {
+        const response = await fetch(`/api/check-phone?phone=${encodeURIComponent(phone)}`);
+        const data = await response.json();
+        return data.exists;
+    } catch (error) {
+        console.error('Error checking phone:', error);
+        return false;
+    }
+}
+
+// إرسال كود استرجاع كلمة السر
+async function sendResetCode(phone) {
+    try {
+        const response = await fetch('/api/send-reset-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phone })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error sending reset code:', error);
+        return { success: false, message: 'حدث خطأ في الاتصال' };
+    }
+}
+
+// إعادة تعيين كلمة السر
+async function resetPassword(phone, code, newPassword) {
+    try {
+        const response = await fetch('/api/reset-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ phone, code, new_password: newPassword })
+        });
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        return { success: false, message: 'حدث خطأ في الاتصال' };
     }
 }
 
 // ==================== دوال الجداول ====================
-
 function initDataTable(tableId, options = {}) {
     const table = document.getElementById(tableId);
     if (table && typeof $ !== 'undefined' && $.fn.DataTable) {
@@ -159,7 +261,6 @@ function initDataTable(tableId, options = {}) {
 }
 
 // ==================== دوال البحث ====================
-
 function filterTable(searchId, tableId, columnIndex = 0) {
     const searchInput = document.getElementById(searchId);
     const table = document.getElementById(tableId);
@@ -179,10 +280,11 @@ function filterTable(searchId, tableId, columnIndex = 0) {
 }
 
 // ==================== دوال التحميل ====================
-
 function showLoading(containerId, message = 'جاري التحميل...') {
     const container = document.getElementById(containerId);
     if (container) {
+        const originalContent = container.innerHTML;
+        container.setAttribute('data-original', originalContent);
         container.innerHTML = `
             <div class="text-center p-5">
                 <div class="loader"></div>
@@ -192,15 +294,15 @@ function showLoading(containerId, message = 'جاري التحميل...') {
     }
 }
 
-function hideLoading(containerId, content) {
+function hideLoading(containerId) {
     const container = document.getElementById(containerId);
-    if (container && content) {
-        container.innerHTML = content;
+    if (container && container.getAttribute('data-original')) {
+        container.innerHTML = container.getAttribute('data-original');
+        container.removeAttribute('data-original');
     }
 }
 
 // ==================== دوال التقارير ====================
-
 function downloadReport(url, filename) {
     const link = document.createElement('a');
     link.href = url;
@@ -210,34 +312,11 @@ function downloadReport(url, filename) {
     document.body.removeChild(link);
 }
 
-// ==================== دوال الإحصائيات ====================
-
-function animateNumber(element, start, end, duration = 1000) {
-    if (!element) return;
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const value = Math.floor(progress * (end - start) + start);
-        element.textContent = value.toLocaleString();
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-    window.requestAnimationFrame(step);
+// ==================== تغيير وضع الأدمن ====================
+function enableAdminMode() {
+    document.body.classList.add('admin-mode');
 }
 
-// تشغيل عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    // تحريك الأرقام في الإحصائيات
-    const statNumbers = document.querySelectorAll('.stat-card h3');
-    statNumbers.forEach(function(stat) {
-        const target = parseInt(stat.textContent.replace(/[^0-9]/g, ''));
-        if (target) {
-            stat.textContent = '0';
-            animateNumber(stat, 0, target, 1000);
-        }
-    });
-    
-    console.log('✅ نظام دعم الدفعة 109 - التصميم العصاري جاهز');
-});
+function disableAdminMode() {
+    document.body.classList.remove('admin-mode');
+}
