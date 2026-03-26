@@ -8,14 +8,14 @@ class User(UserMixin):
         self.full_name = user_data['full_name']
         self.phone = user_data['phone']
         self.password = user_data['password']
-        self.role = user_data.get('role', 'user')
-        self.telegram_id = user_data.get('telegram_id')
-        self.email = user_data.get('email')
-        self.college = user_data.get('college')
-        self.specialization = user_data.get('specialization')
-        self.monthly_donation = user_data.get('monthly_donation', 0)
-        self.is_active = user_data.get('is_active', 1)
-        self.created_at = user_data.get('created_at', datetime.now())
+        self.role = user_data['role'] if 'role' in user_data.keys() else 'user'
+        self.telegram_id = user_data['telegram_id'] if 'telegram_id' in user_data.keys() else None
+        self.email = user_data['email'] if 'email' in user_data.keys() else None
+        self.college = user_data['college'] if 'college' in user_data.keys() else None
+        self.specialization = user_data['specialization'] if 'specialization' in user_data.keys() else None
+        self.monthly_donation = user_data['monthly_donation'] if 'monthly_donation' in user_data.keys() else 0
+        self.is_active = user_data['is_active'] if 'is_active' in user_data.keys() else 1
+        self.created_at = user_data['created_at'] if 'created_at' in user_data.keys() else datetime.now()
     
     def get_id(self):
         return str(self.id)
@@ -55,13 +55,13 @@ class Donation:
         self.id = data['id']
         self.user_id = data['user_id']
         self.amount = data['amount']
-        self.receipt_path = data.get('receipt_path')
-        self.status = data.get('status', 'pending')
-        self.notes = data.get('notes')
-        self.is_monthly = data.get('is_monthly', False)
-        self.created_at = data.get('created_at', datetime.now())
-        self.reviewed_at = data.get('reviewed_at')
-        self.reviewed_by = data.get('reviewed_by')
+        self.receipt_path = data['receipt_path'] if 'receipt_path' in data.keys() else None
+        self.status = data['status'] if 'status' in data.keys() else 'pending'
+        self.notes = data['notes'] if 'notes' in data.keys() else None
+        self.is_monthly = data['is_monthly'] if 'is_monthly' in data.keys() else False
+        self.created_at = data['created_at'] if 'created_at' in data.keys() else datetime.now()
+        self.reviewed_at = data['reviewed_at'] if 'reviewed_at' in data.keys() else None
+        self.reviewed_by = data['reviewed_by'] if 'reviewed_by' in data.keys() else None
 
 
 class Martyr:
@@ -69,14 +69,14 @@ class Martyr:
     def __init__(self, data):
         self.id = data['id']
         self.full_name = data['full_name']
-        self.birth_date = data.get('birth_date')
-        self.martyrdom_date = data.get('martyrdom_date')
-        self.rank = data.get('rank')
-        self.unit = data.get('unit')
-        self.bio = data.get('bio')
-        self.image_path = data.get('image_path')
-        self.family_id = data.get('family_id')
-        self.created_at = data.get('created_at', datetime.now())
+        self.birth_date = data['birth_date'] if 'birth_date' in data.keys() else None
+        self.martyrdom_date = data['martyrdom_date'] if 'martyrdom_date' in data.keys() else None
+        self.rank = data['rank'] if 'rank' in data.keys() else None
+        self.unit = data['unit'] if 'unit' in data.keys() else None
+        self.bio = data['bio'] if 'bio' in data.keys() else None
+        self.image_path = data['image_path'] if 'image_path' in data.keys() else None
+        self.family_id = data['family_id'] if 'family_id' in data.keys() else None
+        self.created_at = data['created_at'] if 'created_at' in data.keys() else datetime.now()
 
 
 class ResetCode:
@@ -85,5 +85,5 @@ class ResetCode:
         self.id = code_data['id']
         self.user_id = code_data['user_id']
         self.code = code_data['code']
-        self.created_at = code_data.get('created_at', datetime.now())
+        self.created_at = code_data['created_at'] if 'created_at' in code_data.keys() else datetime.now()
         self.expires_at = code_data['expires_at']
