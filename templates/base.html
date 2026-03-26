@@ -11,56 +11,67 @@
     <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
-        /* تنسيق الأزرار العلوية */
-        .btn-nav-login {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
+        /* تنسيق الأزرار العلوية بنفس تصميم زر إنشاء الحساب */
+        .btn-nav {
             border-radius: 30px;
-            padding: 6px 20px;
+            padding: 8px 24px;
             font-weight: 600;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-nav-login {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .btn-nav-login:hover {
-            background: white;
-            color: #0d6efd;
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
             transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
         .btn-nav-register {
-            background: white;
-            border: 2px solid white;
-            color: #0d6efd;
-            border-radius: 30px;
-            padding: 6px 20px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .btn-nav-register:hover {
-            background: transparent;
-            color: white;
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
             transform: translateY(-2px);
+            color: white;
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
         }
         .navbar {
             padding: 12px 0;
+            background: linear-gradient(135deg, #1e1b4b, #2d2a5e);
         }
         .navbar-brand {
             font-size: 1.3rem;
             font-weight: 700;
+            color: white !important;
+        }
+        .dropdown-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            border-radius: 30px;
+            padding: 8px 20px;
+        }
+        .dropdown-toggle:hover {
+            background: rgba(255,255,255,0.3);
         }
     </style>
     
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-dark bg-primary">
+    <nav class="navbar">
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-hand-holding-heart"></i> صندوق الدفعة 109
@@ -68,15 +79,15 @@
             
             <div class="d-flex align-items-center gap-2">
                 {% if not current_user.is_authenticated %}
-                    <a href="/login" class="btn-nav-login">
+                    <a href="/login" class="btn-nav btn-nav-login">
                         <i class="fas fa-sign-in-alt"></i> دخول
                     </a>
-                    <a href="/register" class="btn-nav-register">
+                    <a href="/register" class="btn-nav btn-nav-register">
                         <i class="fas fa-user-plus"></i> تسجيل
                     </a>
                 {% else %}
                     <div class="dropdown">
-                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> {{ current_user.full_name }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
