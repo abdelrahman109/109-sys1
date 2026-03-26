@@ -721,3 +721,15 @@ def get_system_health(app):
         'martyrs': counts['martyrs'],
         'support_logs': counts['support_logs'],
     }
+
+def init_reset_codes_table(app):
+    """إنشاء جدول reset_codes إذا لم يكن موجوداً"""
+    db = get_db(app)
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS reset_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            code TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL
+        )
+    ''')
