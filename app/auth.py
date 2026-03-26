@@ -48,11 +48,11 @@ def login():
         remember = request.form.get('remember', False)
         
         db = get_db(current_app)
-        user = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
+        user_data = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
         
-        if user and check_password_hash(user['password'], password):
+        if user_data and check_password_hash(user_data['password'], password):
             from app.models import User
-            user_obj = User(user)
+            user_obj = User(user_data)
             login_user(user_obj, remember=remember)
             flash('تم تسجيل الدخول بنجاح', 'success')
             return redirect(url_for('auth.home'))
@@ -82,15 +82,21 @@ def register():
         
         # إنشاء حساب جديد
         hashed_password = generate_password_hash(password)
-        db.execute(
-            'INSERT INTO users (full_name, phone, password, role, created_at) VALUES (?, ?, ?, ?, ?)',
-            (full_name, phone, hashed_password, 'user', datetime.now())
-        )
+        try:
+            db.execute(
+                'INSERT INTO users (full_name, phone, password, role, created_at) VALUES (?, ?, ?, ?, ?)',
+                (full_name, phone, hashed_password, 'user', datetime.now())
+            )
+            db.execute('COMMIT')
+        except Exception as e:
+            flash(f'حدث خطأ: {e}', 'danger')
+            return redirect(url_for('auth.register'))
         
         # تسجيل الدخول تلقائياً
-        user = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
+        user_data = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
         from app.models import User
-        login_user(User(user))
+        user_obj = User(user_data)
+        login_user(user_obj)
         
         flash('تم إنشاء الحساب بنجاح! مرحباً بك في نظام دعم الدفعة 109', 'success')
         return redirect(url_for('auth.home'))
