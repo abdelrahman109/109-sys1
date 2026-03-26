@@ -5,110 +5,22 @@
 {% block content %}
 <!-- Hero Section -->
 <div class="hero text-center py-5">
-    <h1 class="display-4">صندوق دعم الدفعة 109</h1>
+    <h1 class="display-4">صندوق الدفعة 109</h1>
     <p class="lead">نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
     {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('auth.donate') }}" class="btn btn-primary btn-lg mt-3">
-            <i class="fas fa-hand-holding-heart"></i> تبرع الآن
-        </a>
+        <div class="mt-4">
+            <a href="/login" class="btn btn-primary btn-lg mx-2">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+            </a>
+            <a href="/register" class="btn btn-outline-light btn-lg mx-2">
+                <i class="fas fa-user-plus"></i> إنشاء حساب
+            </a>
+        </div>
+    {% else %}
+        <div class="mt-4">
+            <p class="lead">مرحباً بك {{ current_user.full_name }}</p>
+            <a href="/profile" class="btn btn-primary">الذهاب إلى ملفي الشخصي</a>
+        </div>
     {% endif %}
 </div>
-
-<!-- Features Section -->
-<div class="row mt-5">
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
-                <h3>تبرع الآن</h3>
-                <p>ساهم في دعم الأسر المحتاجة والشهداء من خلال تبرعاتك</p>
-                <a href="{{ url_for('auth.donate') }}" class="btn btn-primary">تبرع</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-star-of-life fa-3x text-primary mb-3"></i>
-                <h3>الشهداء</h3>
-                <p>تعرف على أسماء وصور الشهداء ودعم أسرهم</p>
-                <a href="{{ url_for('auth.martyrs') }}" class="btn btn-outline-primary">عرض الشهداء</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
-                <h3>التقارير</h3>
-                <p>عرض تقارير التبرعات والمصاريف</p>
-                <a href="{{ url_for('auth.reports') }}" class="btn btn-outline-primary">عرض التقارير</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- رسالة للمستخدمين العاديين -->
-{% if current_user.is_authenticated and current_user.role != 'admin' %}
-<div class="card text-center mt-4">
-    <div class="card-header">
-        <i class="fas fa-info-circle"></i> مرحباً بك
-    </div>
-    <div class="card-body">
-        <p>يمكنك من خلال حسابك:</p>
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a href="{{ url_for('donations.my_donations') }}" class="btn btn-outline-primary">
-                <i class="fas fa-donate"></i> تبرعاتي
-            </a>
-            <a href="{{ url_for('certificates.my_certificates') }}" class="btn btn-outline-primary">
-                <i class="fas fa-certificate"></i> شهاداتي
-            </a>
-            <a href="{{ url_for('users.profile') }}" class="btn btn-outline-primary">
-                <i class="fas fa-user"></i> ملفي الشخصي
-            </a>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<!-- إحصائيات للأدمن فقط -->
-{% if current_user.is_authenticated and current_user.role == 'admin' %}
-<div class="stats-grid mt-5">
-    <div class="stat-card">
-        <i class="fas fa-users"></i>
-        <h3 id="total-users">0</h3>
-        <p>عدد المستخدمين</p>
-    </div>
-    <div class="stat-card">
-        <i class="fas fa-hand-holding-usd"></i>
-        <h3 id="total-donations">0</h3>
-        <p>إجمالي التبرعات</p>
-    </div>
-    <div class="stat-card">
-        <i class="fas fa-chart-line"></i>
-        <h3 id="total-expenses">0</h3>
-        <p>إجمالي المصاريف</p>
-    </div>
-    <div class="stat-card">
-        <i class="fas fa-star-of-life"></i>
-        <h3 id="total-martyrs">0</h3>
-        <p>عدد الشهداء</p>
-    </div>
-</div>
-{% endif %}
-
-<script>
-// تحميل الإحصائيات (للأدمن فقط)
-{% if current_user.is_authenticated and current_user.role == 'admin' %}
-fetch('/api/stats')
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('total-users').textContent = data.users || 0;
-        document.getElementById('total-donations').textContent = formatCurrency(data.donations || 0);
-        document.getElementById('total-expenses').textContent = formatCurrency(data.expenses || 0);
-        document.getElementById('total-martyrs').textContent = data.martyrs || 0;
-    })
-    .catch(err => console.error('Error loading stats:', err));
-{% endif %}
-</script>
 {% endblock %}
