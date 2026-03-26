@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}الرئيسية - صندوق الدفعة 109{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto text-center">
+        <h1 class="display-4 mb-4">صندوق دعم الدفعة 109</h1>
+        <p class="lead mb-5">نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
+        
+        <div class="row mt-5">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-hand-holding-heart fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">تبرع الآن</h5>
+                        <p class="card-text">ساهم في دعم الأسر المحتاجة والشهداء</p>
+                        <a href="{{ url_for('donate') }}" class="btn btn-primary">تبرع</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">الشفافية</h5>
+                        <p class="card-text">تابع إيرادات ومصاريف الصندوق</p>
+                        <a href="{{ url_for('transparency') }}" class="btn btn-outline-primary">عرض التقارير</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-star-of-life fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">الشهداء</h5>
+                        <p class="card-text">تعرف على أسماء وصور الشهداء</p>
+                        <a href="{{ url_for('martyrs') }}" class="btn btn-outline-primary">عرض الشهداء</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
