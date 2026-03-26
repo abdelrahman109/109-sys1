@@ -1,3 +1,4 @@
+cat > ~/109-sys1/templates/public/donate.html << 'EOF'
 {% extends "base.html" %}
 
 {% block title %}تبرع - صندوق الدفعة 109{% endblock %}
@@ -19,7 +20,7 @@
                         </div>
                         <div class="card-body">
                             <p><strong>بنك مصر</strong></p>
-                            <p>رقم الحساب: {{ config.INSTAPAY_NUMBER or '123456789' }}</p>
+                            <p>رقم الحساب: 123456789</p>
                             <p>اسم الحساب: صندوق دعم الدفعة 109</p>
                             <p>رمز السويفت: BMISEGCX</p>
                         </div>
@@ -32,10 +33,7 @@
                         </div>
                         <div class="card-body">
                             <p><strong>فودافون كاش / إنستاباي</strong></p>
-                            <p>رقم المحفظة: {{ config.INSTAPAY_NUMBER or '01020877259' }}</p>
-                            <hr>
-                            <p><strong>رابط التبرع الإلكتروني</strong></p>
-                            <p><a href="{{ config.INSTAPAY_LINK or '#' }}" target="_blank" class="btn btn-outline-primary">اضغط للتبرع عبر إنستاباي</a></p>
+                            <p>رقم المحفظة: 01020877259</p>
                         </div>
                     </div>
                 </div>
@@ -47,7 +45,7 @@
                 </div>
                 <div class="card-body">
                     <p>بعد إتمام عملية التبرع، يرجى رفع الإيصال للمراجعة</p>
-                    <form method="POST" action="{{ url_for('donations.submit_donation') }}" enctype="multipart/form-data">
+                    <form method="POST" action="/donate/submit" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="form-group">
                             <label class="form-label">المبلغ المتبرع به (جنيه)</label>
@@ -60,7 +58,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">ملاحظات (اختياري)</label>
-                            <textarea name="notes" class="form-control" rows="3" placeholder="أي معلومات إضافية عن التبرع"></textarea>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">
                             <i class="fas fa-upload"></i> رفع الإيصال
@@ -72,3 +70,4 @@
     </div>
 </div>
 {% endblock %}
+EOF
