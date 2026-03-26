@@ -120,68 +120,160 @@ body {
     transform: scale(1.05);
 }
 
-.navbar-toggler {
+/* Navigation Actions - أزرار الدخول والتسجيل */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.btn-login {
+    background: transparent;
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.btn-login:hover {
+    background: var(--gradient);
+    color: white;
+    border-color: transparent;
+    transform: translateY(-2px);
+}
+
+.btn-register {
+    background: var(--gradient);
+    color: white;
+}
+
+.btn-register:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+/* Hamburger Button */
+.hamburger {
     display: none;
     background: none;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--primary);
-}
-
-.nav-links {
-    display: flex;
-    gap: 1.5rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    flex-wrap: wrap;
-}
-
-.nav-links a {
-    text-decoration: none;
-    color: var(--dark);
-    font-weight: 500;
+    padding: 8px;
+    border-radius: 8px;
     transition: all 0.3s ease;
-    position: relative;
-    padding: 0.5rem 0;
 }
 
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
+.hamburger:hover {
+    background: rgba(67, 97, 238, 0.1);
+}
+
+/* Mobile Menu */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    z-index: 1001;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+}
+
+.mobile-menu.active {
     right: 0;
-    width: 0;
-    height: 2px;
-    background: var(--gradient);
-    transition: width 0.3s ease;
 }
 
-.nav-links a:hover::after {
-    width: 100%;
+.mobile-menu-inner {
+    padding: 20px;
+    margin-top: 60px;
 }
 
-.nav-links a:hover {
+.mobile-nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.mobile-nav-links li {
+    margin-bottom: 5px;
+}
+
+.mobile-nav-links a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    color: var(--dark);
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.mobile-nav-links a i {
+    width: 24px;
     color: var(--primary);
 }
 
-.nav-links .btn-outline-light {
-    background: transparent;
-    border: 2px solid var(--primary);
-    padding: 0.4rem 1.2rem;
-    border-radius: 25px;
+.mobile-nav-links a:hover {
+    background: rgba(67, 97, 238, 0.1);
     color: var(--primary);
 }
 
-.nav-links .btn-outline-light:hover {
-    background: var(--gradient);
-    color: white;
-    border-color: transparent;
+/* Overlay when menu is open */
+body.menu-open::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
-.nav-links .btn-outline-light::after {
-    display: none;
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .navbar .nav-links {
+        display: none;
+    }
+    
+    .hamburger {
+        display: block;
+    }
+    
+    .btn-nav {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+    
+    .btn-nav i {
+        font-size: 0.8rem;
+    }
+    
+    .navbar-brand {
+        font-size: 1rem;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-menu {
+        display: none;
+    }
 }
 
 /* ==================== حاوية عامة ==================== */
@@ -507,7 +599,7 @@ body {
     opacity: 1;
 }
 
-/* ==================== قسم البطل ==================== */
+/* ==================== قسم البطل (Hero) ==================== */
 .hero {
     text-align: center;
     padding: 3rem 1.5rem;
@@ -618,35 +710,6 @@ footer a:hover {
 
 /* ==================== استجابة للشاشات الصغيرة (موبايل) ==================== */
 @media (max-width: 768px) {
-    .navbar-toggler {
-        display: block;
-    }
-    
-    .nav-links {
-        display: none;
-        width: 100%;
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 1rem 0;
-    }
-    
-    .nav-links.active {
-        display: flex;
-    }
-    
-    .nav-links li {
-        width: 100%;
-    }
-    
-    .nav-links a {
-        display: block;
-        padding: 0.5rem 0;
-    }
-    
-    .navbar-brand {
-        font-size: 1.2rem;
-    }
-    
     .hero {
         padding: 2rem 1rem;
     }
@@ -724,10 +787,6 @@ footer a:hover {
     
     .navbar-brand {
         font-size: 1.3rem;
-    }
-    
-    .nav-links {
-        gap: 1rem;
     }
 }
 
@@ -818,460 +877,4 @@ footer a:hover {
 
 body.admin-mode .admin-only {
     display: block;
-}
-/* ==================== إضافات القائمة المنسدلة للموبايل ==================== */
-
-/* Navigation Actions */
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-nav {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.btn-login {
-    background: transparent;
-    border: 2px solid var(--primary, #4361ee);
-    color: var(--primary, #4361ee);
-}
-
-.btn-login:hover {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    color: white;
-    border-color: transparent;
-    transform: translateY(-2px);
-}
-
-.btn-register {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    color: white;
-}
-
-.btn-register:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
-}
-
-/* Hamburger Button */
-.hamburger {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--primary, #4361ee);
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.hamburger:hover {
-    background: rgba(67, 97, 238, 0.1);
-}
-
-/* Mobile Menu */
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 280px;
-    height: 100vh;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    z-index: 1001;
-    transition: right 0.3s ease;
-    overflow-y: auto;
-}
-
-.mobile-menu.active {
-    right: 0;
-}
-
-.mobile-menu-inner {
-    padding: 20px;
-    margin-top: 60px;
-}
-
-.mobile-nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.mobile-nav-links li {
-    margin-bottom: 5px;
-}
-
-.mobile-nav-links a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: #1a1a2e;
-    text-decoration: none;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.mobile-nav-links a i {
-    width: 24px;
-    color: #4361ee;
-}
-
-.mobile-nav-links a:hover {
-    background: rgba(67, 97, 238, 0.1);
-    color: #4361ee;
-}
-
-/* Overlay when menu is open */
-body.menu-open::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .navbar .nav-links {
-        display: none;
-    }
-    
-    .hamburger {
-        display: block;
-    }
-    
-    .btn-nav {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-    
-    .btn-nav i {
-        font-size: 0.8rem;
-    }
-    
-    .navbar-brand {
-        font-size: 1rem;
-    }
-}
-
-@media (min-width: 769px) {
-    .mobile-menu {
-        display: none;
-    }
-}
-
-/* ==================== تنسيقات النماذج ==================== */
-.auth-container {
-    max-width: 500px;
-    margin: 2rem auto;
-}
-
-.auth-card {
-    background: white;
-    border-radius: 30px;
-    padding: 2rem;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-}
-
-.auth-card h2 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #4361ee;
-    font-weight: 700;
-}
-
-.auth-footer {
-    text-align: center;
-    margin-top: 1.5rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e9ecef;
-}
-
-.auth-footer a {
-    color: #4361ee;
-    text-decoration: none;
-}
-
-.auth-footer a:hover {
-    text-decoration: underline;
-}
-
-/* ==================== تنسيقات الأزرار ==================== */
-.btn-block {
-    width: 100%;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 12px;
-    color: white;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(67, 97, 238, 0.4);
-}
-
-.btn-outline {
-    background: transparent;
-    border: 2px solid #4361ee;
-    color: #4361ee;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.btn-outline:hover {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    color: white;
-    border-color: transparent;
-}
-
-/* ==================== تنسيقات الحقول ==================== */
-.form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #1a1a2e;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e9ecef;
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #4361ee;
-    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
-}
-
-.form-control.is-invalid {
-    border-color: #f72585;
-}
-
-.invalid-feedback {
-    color: #f72585;
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-}
-
-/* ==================== البطاقات ==================== */
-.card {
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.card-header {
-    font-size: 1.3rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid rgba(67, 97, 238, 0.2);
-    color: #4361ee;
-}
-
-/* ==================== التذييل ==================== */
-footer {
-    background: #1a1a2e;
-    color: white;
-    text-align: center;
-    padding: 2rem 0;
-    margin-top: 3rem;
-}
-
-footer a {
-    color: #4361ee;
-    text-decoration: none;
-}
-/* ==================== إضافات القائمة المنسدلة للموبايل ==================== */
-
-/* Navigation Actions */
-.nav-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-nav {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-decoration: none;
-    transition: all 0.3s ease;
-}
-
-.btn-login {
-    background: transparent;
-    border: 2px solid var(--primary, #4361ee);
-    color: var(--primary, #4361ee);
-}
-
-.btn-login:hover {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    color: white;
-    border-color: transparent;
-    transform: translateY(-2px);
-}
-
-.btn-register {
-    background: linear-gradient(135deg, #4361ee 0%, #7209b7 100%);
-    color: white;
-}
-
-.btn-register:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
-}
-
-/* Hamburger Button */
-.hamburger {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--primary, #4361ee);
-    padding: 8px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.hamburger:hover {
-    background: rgba(67, 97, 238, 0.1);
-}
-
-/* Mobile Menu */
-.mobile-menu {
-    position: fixed;
-    top: 0;
-    right: -100%;
-    width: 280px;
-    height: 100vh;
-    background: white;
-    box-shadow: -2px 0 10px rgba(0,0,0,0.1);
-    z-index: 1001;
-    transition: right 0.3s ease;
-    overflow-y: auto;
-}
-
-.mobile-menu.active {
-    right: 0;
-}
-
-.mobile-menu-inner {
-    padding: 20px;
-    margin-top: 60px;
-}
-
-.mobile-nav-links {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.mobile-nav-links li {
-    margin-bottom: 5px;
-}
-
-.mobile-nav-links a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    color: #1a1a2e;
-    text-decoration: none;
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    font-weight: 500;
-}
-
-.mobile-nav-links a i {
-    width: 24px;
-    color: #4361ee;
-}
-
-.mobile-nav-links a:hover {
-    background: rgba(67, 97, 238, 0.1);
-    color: #4361ee;
-}
-
-/* Overlay when menu is open */
-body.menu-open::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .navbar .nav-links {
-        display: none;
-    }
-    
-    .hamburger {
-        display: block;
-    }
-    
-    .btn-nav {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-    }
-    
-    .btn-nav i {
-        font-size: 0.8rem;
-    }
-    
-    .navbar-brand {
-        font-size: 1rem;
-    }
-}
-
-@media (min-width: 769px) {
-    .mobile-menu {
-        display: none;
-    }
 }
