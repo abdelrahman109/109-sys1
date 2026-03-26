@@ -3,23 +3,25 @@
 {% block title %}الرئيسية - صندوق الدفعة 109{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="hero text-center py-5">
-    <h1 class="display-4">صندوق الدفعة 109</h1>
-    <p class="lead">نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
+<div class="hero text-center py-5" style="background: linear-gradient(135deg, #4361ee, #7209b7); border-radius: 20px; color: white;">
+    <h1 class="display-4 fw-bold">صندوق دعم الدفعة 109</h1>
+    <p class="lead mt-3">نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
+    
     {% if not current_user.is_authenticated %}
         <div class="mt-4">
-            <a href="/login" class="btn btn-primary btn-lg mx-2">
-                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
-            </a>
-            <a href="/register" class="btn btn-outline-light btn-lg mx-2">
+            <a href="/register" class="btn btn-light btn-lg rounded-pill px-4 mx-2">
                 <i class="fas fa-user-plus"></i> إنشاء حساب
+            </a>
+            <a href="/login" class="btn btn-outline-light btn-lg rounded-pill px-4 mx-2">
+                <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
             </a>
         </div>
     {% else %}
         <div class="mt-4">
             <p class="lead">مرحباً بك {{ current_user.full_name }}</p>
-            <a href="/profile" class="btn btn-primary">الذهاب إلى ملفي الشخصي</a>
+            <a href="/profile" class="btn btn-light btn-lg rounded-pill px-4">
+                <i class="fas fa-user"></i> الذهاب إلى ملفي الشخصي
+            </a>
         </div>
     {% endif %}
 </div>
