@@ -56,9 +56,10 @@ def create_app():
     def _bootstrap():
         load_current_user(app)
         ensure_csrf_token()
-        # للتصحيح - طباعة حالة المستخدم
+        # للتصحيح - التحقق من نوع current_user
         if hasattr(g, 'current_user') and g.current_user:
-            print(f"Before request - User loaded: {g.current_user.full_name}")
+            if hasattr(g.current_user, 'full_name'):
+                print(f"Before request - User loaded: {g.current_user.full_name}")
         else:
             print("Before request - No user loaded")
 
