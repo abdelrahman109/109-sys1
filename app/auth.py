@@ -60,7 +60,6 @@ def login():
             flash('رقم الهاتف أو كلمة المرور غير صحيحة', 'danger')
     
     return render_template('public/login.html')
-
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     """تسجيل حساب جديد"""
