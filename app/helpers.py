@@ -1,4 +1,3 @@
-cat > ~/109-sys1/app/helpers.py << 'EOF'
 import os
 import re
 import uuid
@@ -16,10 +15,7 @@ try:
 except:
     pass
 
-# ==================== تنسيق العملة ====================
-
 def format_currency(amount):
-    """تنسيق الأرقام كعملة (جنيه مصري)"""
     if amount is None:
         return "0 ج.م"
     try:
@@ -27,28 +23,20 @@ def format_currency(amount):
     except:
         return f"{amount} ج.م"
 
-# ==================== دوال الأمان ====================
-
 def generate_csrf_token():
-    """توليد توكن CSRF"""
     if '_csrf_token' not in session:
         session['_csrf_token'] = secrets.token_hex(16)
     return session['_csrf_token']
 
 def ensure_csrf_token():
-    """التأكد من وجود توكن CSRF في الجلسة"""
     if '_csrf_token' not in session:
         session['_csrf_token'] = secrets.token_hex(16)
     return True
 
 def validate_csrf(token):
-    """التحقق من توكن CSRF"""
     return token and token == session.get('_csrf_token')
 
-# ==================== دوال تحميل المستخدم ====================
-
 def load_current_user(app):
-    """تحميل المستخدم الحالي من قاعدة البيانات"""
     from flask import g, session
     from .models import User
     from .db import get_db
@@ -66,10 +54,7 @@ def load_current_user(app):
     
     g.current_user = None
 
-# ==================== دوال المصادقة ====================
-
 def login_required(f):
-    """Decorator لتأكيد تسجيل الدخول"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not hasattr(g, 'current_user') or not g.current_user:
@@ -79,7 +64,6 @@ def login_required(f):
     return decorated_function
 
 def admin_required(f):
-    """Decorator لتأكيد صلاحيات الأدمن"""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not hasattr(g, 'current_user') or not g.current_user:
@@ -92,7 +76,6 @@ def admin_required(f):
     return decorated_function
 
 def role_required(*roles):
-    """Decorator لتأكيد صلاحيات محددة"""
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
@@ -106,16 +89,12 @@ def role_required(*roles):
         return decorated_function
     return decorator
 
-# ==================== دوال رفع الملفات ====================
-
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'webp'}
 
 def allowed_file(filename):
-    """التحقق من امتداد الملف المسموح"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def secure_image_upload(file, upload_folder):
-    """رفع صورة بشكل آمن"""
     if not file or not file.filename:
         return None, "لم يتم اختيار ملف"
     
@@ -134,49 +113,37 @@ def secure_image_upload(file, upload_folder):
     except Exception as e:
         return None, f"فشل رفع الملف: {str(e)}"
 
-# ==================== دوال مساعدة عامة ====================
-
 def generate_unique_code(prefix="DON", length=8):
-    """توليد كود فريد"""
     random_part = secrets.token_hex(length // 2)[:length]
     return f"{prefix}{random_part.upper()}"
 
 def validate_egyptian_phone(phone):
-    """التحقق من صحة رقم الهاتف المصري"""
     pattern = r'^(010|011|012|015)[0-9]{8}$'
     return bool(re.match(pattern, phone))
 
 def validate_email(email):
-    """التحقق من صحة البريد الإلكتروني"""
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return bool(re.match(pattern, email))
 
 def get_client_ip():
-    """الحصول على عنوان IP للعميل"""
     if request.headers.get('X-Forwarded-For'):
         return request.headers.get('X-Forwarded-For').split(',')[0]
     return request.remote_addr
 
 def generate_reset_code():
-    """توليد كود استرجاع عشوائي من 6 أرقام"""
     return ''.join(secrets.choice('0123456789') for _ in range(6))
 
 def calculate_age(birth_date):
-    """حساب العمر من تاريخ الميلاد"""
     if not birth_date:
         return None
     today = datetime.now().date()
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
 
-# ==================== دوال إضافية مطلوبة ====================
-
 def ensure_dir(path):
-    """التأكد من وجود المجلد، وإنشاؤه إذا لم يكن موجوداً"""
     if not os.path.exists(path):
         os.makedirs(path)
     return path
 
 def now_str():
-    """إرجاع الوقت الحالي كسلسلة نصية"""
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 EOF
