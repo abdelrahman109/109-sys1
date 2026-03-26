@@ -1,0 +1,41 @@
+cat > ~/109-sys1/templates/public/martyrs.html << 'EOF'
+{% extends "base.html" %}
+
+{% block title %}الشهداء - صندوق الدفعة 109{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-star-of-life"></i> قائمة الشهداء
+        </div>
+        <div class="card-body">
+            {% if martyrs %}
+                <div class="row">
+                    {% for martyr in martyrs %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card text-center h-100">
+                            {% if martyr.image_path %}
+                                <img src="/{{ martyr.image_path }}" class="martyr-image mx-auto mt-3" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;">
+                            {% else %}
+                                <i class="fas fa-star-of-life fa-3x text-primary mt-3"></i>
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ martyr.full_name }}</h5>
+                                <p class="card-text text-muted">{{ martyr.military_rank or 'شهيد' }}</p>
+                                {% if martyr.martyrdom_date %}
+                                    <small>تاريخ الاستشهاد: {{ martyr.martyrdom_date }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-center">لا توجد بيانات للشهداء حالياً</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+EOF
