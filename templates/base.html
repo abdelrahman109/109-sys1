@@ -18,29 +18,29 @@
     <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
-        /* تنسيق إضافي لضمان ظهور القائمة في كل الشاشات */
+        /* تنسيق لجعل القائمة المنسدلة تظهر في كل الشاشات */
+        .navbar-toggler {
+            display: block !important;
+        }
         .navbar-collapse {
-            transition: all 0.3s ease;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #0d6efd;
+            padding: 1rem;
+            border-radius: 0 0 10px 10px;
+            z-index: 1000;
+        }
+        .navbar-collapse.collapse:not(.show) {
+            display: none !important;
+        }
+        .navbar-nav {
+            flex-direction: column;
+            gap: 0.5rem;
         }
         @media (min-width: 992px) {
-            .navbar-toggler {
-                display: block !important;
-            }
-            .navbar-collapse {
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background: #0d6efd;
-                padding: 1rem;
-                border-radius: 0 0 10px 10px;
-                z-index: 1000;
-            }
-            .navbar-collapse.collapse:not(.show) {
-                display: none !important;
-            }
             .navbar-nav {
-                flex-direction: column;
                 gap: 0.5rem;
             }
         }
@@ -96,13 +96,11 @@
                     </div>
                 {% endif %}
                 
-                <!-- زر القائمة - يظهر في كل الشاشات -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="القائمة">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
             
-            <!-- القائمة المنسدلة - تظهر عند الضغط على الزر -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
