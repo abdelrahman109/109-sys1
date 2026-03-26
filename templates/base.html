@@ -11,46 +11,57 @@
     <link rel="stylesheet" href="/static/css/style.css">
     
     <style>
-        /* تنسيقات إضافية */
-        .btn-custom-login {
-            background: transparent;
-            border: 2px solid white;
-            color: white;
-            border-radius: 25px;
-            padding: 6px 18px;
+        /* تنسيق الأزرار المستديرة */
+        .btn-round {
+            border-radius: 30px;
+            padding: 8px 24px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-custom-login:hover {
+        .btn-outline-light-round {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            border-radius: 30px;
+            padding: 8px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-light-round:hover {
             background: white;
             color: #0d6efd;
             transform: translateY(-2px);
         }
-        .btn-custom-register {
+        .btn-light-round {
             background: white;
             border: 2px solid white;
             color: #0d6efd;
-            border-radius: 25px;
-            padding: 6px 18px;
+            border-radius: 30px;
+            padding: 8px 24px;
             font-weight: 600;
             transition: all 0.3s ease;
         }
-        .btn-custom-register:hover {
+        .btn-light-round:hover {
             background: transparent;
             color: white;
             transform: translateY(-2px);
         }
+        /* زر القائمة */
         .navbar-toggler {
             border: 2px solid white;
-            padding: 6px 10px;
+            padding: 8px 12px;
         }
         .navbar-toggler-icon {
             filter: brightness(0) invert(1);
         }
+        /* إظهار زر القائمة في كل الشاشات */
+        .navbar-collapse {
+            flex-basis: 100%;
+            flex-grow: 1;
+        }
         @media (min-width: 992px) {
             .navbar-expand-lg .navbar-collapse {
                 display: flex !important;
-                flex-basis: auto;
             }
             .navbar-toggler {
                 display: block !important;
@@ -61,29 +72,31 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary py-3">
         <div class="container">
-            <a class="navbar-brand" href="/">
+            <a class="navbar-brand fw-bold fs-4" href="/">
                 <i class="fas fa-hand-holding-heart"></i> صندوق الدفعة 109
             </a>
             
+            <!-- الأزرار الرئيسية والقائمة -->
             <div class="d-flex align-items-center gap-2">
                 {% if not current_user.is_authenticated %}
-                    <a href="/login" class="btn btn-custom-login">
+                    <a href="/login" class="btn btn-outline-light-round">
                         <i class="fas fa-sign-in-alt"></i> دخول
                     </a>
-                    <a href="/register" class="btn btn-custom-register">
+                    <a href="/register" class="btn btn-light-round">
                         <i class="fas fa-user-plus"></i> تسجيل
                     </a>
                 {% endif %}
                 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="القائمة">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-label="القائمة">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
             
+            <!-- القائمة المنسدلة -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto mt-3 mt-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="/">
                             <i class="fas fa-home"></i> الرئيسية
@@ -129,17 +142,6 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/logout">
                                 <i class="fas fa-sign-out-alt"></i> تسجيل خروج
-                            </a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/login">
-                                <i class="fas fa-sign-in-alt"></i> دخول
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="/register">
-                                <i class="fas fa-user-plus"></i> تسجيل
                             </a>
                         </li>
                     {% endif %}
