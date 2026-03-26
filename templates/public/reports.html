@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}التقارير - صندوق الدفعة 109{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <i class="fas fa-file-alt"></i> التقارير
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <i class="fas fa-hand-holding-usd fa-3x text-primary mb-3"></i>
+                        <h3>تقارير التبرعات</h3>
+                        <p>عرض تقارير التبرعات بتنسيقات مختلفة</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('reports.donations_csv') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </a>
+                            <a href="{{ url_for('reports.donations_excel') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </a>
+                            <a href="{{ url_for('reports.donations_pdf') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
+                        <h3>تقارير المصاريف</h3>
+                        <p>عرض تقارير المصاريف بتنسيقات مختلفة</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('reports.expenses_csv') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </a>
+                            <a href="{{ url_for('reports.expenses_excel') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </a>
+                            <a href="{{ url_for('reports.expenses_pdf') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card text-center">
+                        <i class="fas fa-star-of-life fa-3x text-primary mb-3"></i>
+                        <h3>تقارير الشهداء</h3>
+                        <p>عرض تقارير الشهداء بتنسيقات مختلفة</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <a href="{{ url_for('reports.martyrs_csv') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-csv"></i> CSV
+                            </a>
+                            <a href="{{ url_for('reports.martyrs_excel') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-excel"></i> Excel
+                            </a>
+                            <a href="{{ url_for('reports.martyrs_pdf') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie"></i> ملخص التقارير
+                </div>
+                <div class="card-body">
+                    <canvas id="summaryChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+fetch('/api/stats')
+    .then(res => res.json())
+    .then(data => {
+        const ctx = document.getElementById('summaryChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: ['التبرعات', 'المصاريف'],
+                datasets: [{
+                    data: [data.donations || 0, data.expenses || 0],
+                    backgroundColor: ['#4361ee', '#f72585'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
