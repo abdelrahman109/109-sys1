@@ -1,14 +1,22 @@
 from flask import Flask, g, session, send_from_directory
+from flask_login import LoginManager
 from .config import Config
 from .db import get_db, init_db, seed_admin, seed_reference_data
 from .helpers import ensure_csrf_token, format_currency, load_current_user
 
+# إنشاء login_manager خارج الدالة
+login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
     app.config.from_object(Config)
     app.config['BASE_DIR'] = Config.BASE_DIR if hasattr(Config, 'BASE_DIR') else None
     app.jinja_env.filters['egp'] = format_currency
+
+    # تهيئة Flask-Login
+    login_manager.init_app(app)
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'يرجى تسجيل الدخول أولاً'
 
     # تسجيل الـ blueprints
     from .auth import bp as auth_bp
@@ -78,3 +86,15 @@ def create_app():
         return {'status': 'ok'}
 
     return app
+
+# دالة لتحميل المستخدم
+@login_manager.user_loader
+def load_user(user_id):
+    from .models import User
+    from .db import get_db
+    import flask
+    db = get_db(flask.current_app)
+    user_data = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+    if user_data:
+        return User(user_data)
+    return None
