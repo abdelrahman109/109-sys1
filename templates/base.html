@@ -23,7 +23,7 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
+            <a class="navbar-brand" href="/">
                 <i class="fas fa-hand-holding-heart"></i> صندوق الدفعة 109
             </a>
             <button class="navbar-toggler" type="button" aria-label="القائمة">
@@ -31,19 +31,19 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="nav-links">
-                    <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> الرئيسية</a></li>
-                    <li><a href="{{ url_for('transparency') }}"><i class="fas fa-chart-line"></i> الشفافية</a></li>
-                    <li><a href="{{ url_for('martyrs') }}"><i class="fas fa-star-of-life"></i> الشهداء</a></li>
+                    <li><a href="/"><i class="fas fa-home"></i> الرئيسية</a></li>
+                    <li><a href="/transparency"><i class="fas fa-chart-line"></i> الشفافية</a></li>
+                    <li><a href="/martyrs"><i class="fas fa-star-of-life"></i> الشهداء</a></li>
                     {% if current_user.is_authenticated %}
-                        <li><a href="{{ url_for('profile') }}"><i class="fas fa-user"></i> ملفي الشخصي</a></li>
-                        <li><a href="{{ url_for('my_donations') }}"><i class="fas fa-donate"></i> تبرعاتي</a></li>
-                        <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
+                        <li><a href="/profile"><i class="fas fa-user"></i> ملفي الشخصي</a></li>
+                        <li><a href="/my-donations"><i class="fas fa-donate"></i> تبرعاتي</a></li>
+                        <li><a href="/logout"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</a></li>
                         {% if current_user.role == 'admin' %}
-                            <li><a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-cog"></i> لوحة الأدمن</a></li>
+                            <li><a href="/admin"><i class="fas fa-cog"></i> لوحة الأدمن</a></li>
                         {% endif %}
                     {% else %}
-                        <li><a href="{{ url_for('login') }}"><i class="fas fa-sign-in-alt"></i> دخول</a></li>
-                        <li><a href="{{ url_for('register') }}" class="btn-outline-light"><i class="fas fa-user-plus"></i> تسجيل</a></li>
+                        <li><a href="/login"><i class="fas fa-sign-in-alt"></i> دخول</a></li>
+                        <li><a href="/register" class="btn-outline-light"><i class="fas fa-user-plus"></i> تسجيل</a></li>
                     {% endif %}
                 </ul>
             </div>
