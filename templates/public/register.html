@@ -10,7 +10,7 @@
             إنشاء حساب جديد
         </h2>
         
-        <form method="POST" action="{{ url_for('register') }}" data-validate="true" id="register-form">
+        <form method="POST" action="{{ url_for('public.register') }}" data-validate="true" id="register-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             
             <div class="form-group">
@@ -135,8 +135,8 @@
         </form>
         
         <div class="auth-footer">
-            <p>لديك حساب بالفعل؟ <a href="{{ url_for('login') }}">تسجيل الدخول</a></p>
-            <p><a href="{{ url_for('forgot_password') }}">نسيت كلمة المرور؟</a></p>
+            <p>لديك حساب بالفعل؟ <a href="{{ url_for('public.login') }}">تسجيل الدخول</a></p>
+            <p><a href="{{ url_for('public.forgot_password') }}">نسيت كلمة المرور؟</a></p>
         </div>
     </div>
 </div>
@@ -220,14 +220,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // التحقق قبل الإرسال
     const form = document.getElementById('register-form');
     form.addEventListener('submit', async function(event) {
-        // التحقق من تطابق كلمة المرور
         if (!validatePasswordMatch()) {
             event.preventDefault();
             showMessage('كلمة المرور غير متطابقة', 'danger');
             return;
         }
         
-        // التحقق من رقم الهاتف
         const phone = phoneInput.value.trim();
         if (phone) {
             try {
