@@ -1,12 +1,201 @@
-:root{--bg:#f6f7fb;--card:#fff;--text:#1f2937;--muted:#6b7280;--primary:#1d4ed8;--success:#047857;--danger:#b91c1c;--warning:#b45309;--border:#e5e7eb}
-*{box-sizing:border-box} body{margin:0;font-family:Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)} a{color:var(--primary);text-decoration:none}
-.container{max-width:1200px;margin:auto;padding:18px}.topbar{background:#111827;color:#fff}.navwrap{display:flex;align-items:center;justify-content:space-between;gap:16px}.brand{color:#fff;font-weight:700}.topbar nav{display:flex;flex-wrap:wrap;gap:12px}.topbar nav a{color:#fff}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:16px;box-shadow:0 3px 12px rgba(0,0,0,.04)}.narrow{max-width:520px;margin:auto}.hero{padding:32px}.actions{display:flex;gap:12px;flex-wrap:wrap}.grid{display:grid;gap:16px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.four{grid-template-columns:repeat(4,minmax(0,1fr))}.grid.five{grid-template-columns:repeat(5,minmax(0,1fr));align-items:end}.stack{display:grid;gap:14px}.row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.wrap{flex-wrap:wrap}
-label{display:block;font-size:14px;margin-bottom:10px} input,select,textarea,button{font:inherit} input,select,textarea{width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:#fff} textarea{min-height:90px} .full{grid-column:1/-1}
-.btn{display:inline-block;background:var(--primary);color:#fff;padding:10px 14px;border:none;border-radius:10px;cursor:pointer}.btn.secondary{background:#374151}.btn.danger{background:var(--danger)}.btn.small{padding:7px 10px;font-size:13px}
-.table{width:100%;border-collapse:collapse;font-size:14px}.table th,.table td{border-bottom:1px solid var(--border);padding:10px;text-align:right;vertical-align:top}
-.stat{display:flex;flex-direction:column;gap:6px}.stat strong{font-size:24px}.stat span{color:var(--muted)} .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:#e5e7eb;font-size:12px}.badge.pending_review,.badge.pending{background:#fef3c7}.badge.paid,.badge.approved{background:#d1fae5}.badge.rejected,.badge.cancelled,.badge.expired{background:#fee2e2}.badge.pending_proof{background:#dbeafe}
-.flashes{display:grid;gap:10px;margin:12px 0}.flash{padding:12px 14px;border-radius:10px}.flash.success{background:#d1fae5}.flash.danger{background:#fee2e2}.flash.warning{background:#fef3c7}.flash.info{background:#dbeafe}
-.inline-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.notice{padding:12px;border-radius:10px;background:#eef2ff;margin-bottom:14px}.hidden{display:none} code{background:#f3f4f6;padding:2px 6px;border-radius:6px}.muted{color:var(--muted)}
-.avatar{width:72px;height:72px;object-fit:cover;border-radius:50%;border:1px solid var(--border)}.avatar.large{width:120px;height:120px}.avatar.placeholder{display:flex;align-items:center;justify-content:center;background:#e5e7eb;font-weight:700;font-size:24px}
-@media (max-width:900px){.grid.two,.grid.three,.grid.four,.grid.five{grid-template-columns:1fr}.navwrap{flex-direction:column;align-items:flex-start}.table{font-size:13px}}
+/* ==================== Custom Styles for 109 System ==================== */
+
+/* RTL Support */
+body {
+    font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Navigation */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Cards */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 1rem 1.5rem;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-outline-primary {
+    border: 2px solid #667eea;
+    color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
+
+/* Forms */
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 0.6rem 1rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* Dashboard Stats */
+.stat-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.stat-card i {
+    font-size: 2.5rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.stat-card h3 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.stat-card p {
+    color: #666;
+    margin-bottom: 0;
+}
+
+/* Tables */
+.table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* DataTables */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    border-radius: 8px;
+    margin: 0 2px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    border: none;
+}
+
+/* Alerts */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Footer */
+footer {
+    margin-top: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-header {
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+    }
+    
+    .stat-card h3 {
+        font-size: 1.5rem;
+    }
+    
+    .btn {
+        padding: 0.4rem 1rem;
+    }
+}
+
+/* Dashboard Specific */
+.dashboard-widget {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+/* Donation Progress */
+.progress {
+    height: 10px;
+    border-radius: 5px;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Certificate Page */
+.certificate-preview {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 2rem;
+    background: white;
+    text-align: center;
+}
+
+/* Loading Spinner */
+.spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
