@@ -1,10 +1,12 @@
 from flask import Flask, g, session, send_from_directory
+from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from .config import Config
 from .db import get_db, init_db, seed_admin, seed_reference_data
 from .helpers import ensure_csrf_token, format_currency, load_current_user
 
-# إنشاء login_manager خارج الدالة
+# إنشاء كائنات SQLAlchemy و LoginManager
+db = SQLAlchemy()
 login_manager = LoginManager()
 
 def create_app():
@@ -13,6 +15,9 @@ def create_app():
     app.config['BASE_DIR'] = Config.BASE_DIR if hasattr(Config, 'BASE_DIR') else None
     app.jinja_env.filters['egp'] = format_currency
 
+    # تهيئة SQLAlchemy
+    db.init_app(app)
+    
     # تهيئة Flask-Login
     login_manager.init_app(app)
     login_manager.login_view = 'auth.login'
@@ -35,15 +40,19 @@ def create_app():
     app.register_blueprint(reports_bp)
     app.register_blueprint(certificates_bp)
 
-    # تهيئة قاعدة البيانات
+    # تهيئة قاعدة البيانات (للتوافق مع النظام القديم)
     init_db(app)
     seed_reference_data(app)
     seed_admin(app)
     
     # إنشاء جدول reset_codes
     with app.app_context():
-        db = get_db(app)
-        db.execute('''
+        # إنشاء الجداول باستخدام SQLAlchemy
+        db.create_all()
+        
+        # أيضاً إنشاء جدول reset_codes يدوياً للتوافق
+        conn = get_db(app)
+        conn.execute('''
             CREATE TABLE IF NOT EXISTS reset_codes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 user_id INTEGER NOT NULL,
@@ -87,14 +96,29 @@ def create_app():
 
     return app
 
-# دالة لتحميل المستخدم
+
 @login_manager.user_loader
 def load_user(user_id):
+    """تحميل المستخدم لـ Flask-Login"""
     from .models import User
     from .db import get_db
     import flask
-    db = get_db(flask.current_app)
-    user_data = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
-    if user_data:
-        return User(user_data)
+    
+    try:
+        # محاولة استخدام SQLAlchemy أولاً
+        user = User.query.get(int(user_id))
+        if user:
+            return user
+    except:
+        pass
+    
+    # استخدام قاعدة البيانات المباشرة
+    try:
+        db = get_db(flask.current_app)
+        user_data = db.execute('SELECT * FROM users WHERE id = ?', (user_id,)).fetchone()
+        if user_data:
+            return User(user_data)
+    except:
+        pass
+    
     return None
