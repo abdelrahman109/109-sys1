@@ -2,9 +2,11 @@ import os
 import re
 import uuid
 import secrets
+import csv
+import io
 from datetime import datetime, timedelta
 from functools import wraps
-from flask import flash, redirect, session, url_for, g, current_app, request
+from flask import flash, redirect, session, url_for, g, current_app, request, Response, send_file
 from flask_login import current_user, login_required as flask_login_required
 from werkzeug.utils import secure_filename
 import locale
@@ -131,6 +133,35 @@ def secure_image_upload(file, upload_folder):
         return unique_name, None
     except Exception as e:
         return None, f"فشل رفع الملف: {str(e)}"
+
+# ==================== دوال التقارير ====================
+
+def csv_response(data, filename, fieldnames=None):
+    """إنشاء استجابة CSV للتحميل"""
+    output = io.StringIO()
+    if fieldnames:
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
+    else:
+        writer = csv.writer(output)
+        writer.writerows(data)
+    
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename={filename}.csv'}
+    )
+
+def file_download_response(file_path, filename, as_attachment=True):
+    """إنشاء استجابة لتحميل ملف"""
+    return send_file(
+        file_path,
+        as_attachment=as_attachment,
+        download_name=filename,
+        mimetype='application/octet-stream'
+    )
 
 # ==================== دوال مساعدة عامة ====================
 
