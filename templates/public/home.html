@@ -48,4 +48,67 @@
     </div>
 </div>
 
-<!-- رسالة للمستخدمين الع
+<!-- رسالة للمستخدمين العاديين -->
+{% if current_user.is_authenticated and current_user.role != 'admin' %}
+<div class="card text-center mt-4">
+    <div class="card-header">
+        <i class="fas fa-info-circle"></i> مرحباً بك
+    </div>
+    <div class="card-body">
+        <p>يمكنك من خلال حسابك:</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('donations.my_donations') }}" class="btn btn-outline-primary">
+                <i class="fas fa-donate"></i> تبرعاتي
+            </a>
+            <a href="{{ url_for('certificates.my_certificates') }}" class="btn btn-outline-primary">
+                <i class="fas fa-certificate"></i> شهاداتي
+            </a>
+            <a href="{{ url_for('users.profile') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user"></i> ملفي الشخصي
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- إحصائيات للأدمن فقط -->
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+<div class="stats-grid mt-5">
+    <div class="stat-card">
+        <i class="fas fa-users"></i>
+        <h3 id="total-users">0</h3>
+        <p>عدد المستخدمين</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-hand-holding-usd"></i>
+        <h3 id="total-donations">0</h3>
+        <p>إجمالي التبرعات</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-chart-line"></i>
+        <h3 id="total-expenses">0</h3>
+        <p>إجمالي المصاريف</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-star-of-life"></i>
+        <h3 id="total-martyrs">0</h3>
+        <p>عدد الشهداء</p>
+    </div>
+</div>
+{% endif %}
+
+<script>
+// تحميل الإحصائيات (للأدمن فقط)
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
+fetch('/api/stats')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('total-users').textContent = data.users || 0;
+        document.getElementById('total-donations').textContent = formatCurrency(data.donations || 0);
+        document.getElementById('total-expenses').textContent = formatCurrency(data.expenses || 0);
+        document.getElementById('total-martyrs').textContent = data.martyrs || 0;
+    })
+    .catch(err => console.error('Error loading stats:', err));
+{% endif %}
+</script>
+{% endblock %}
