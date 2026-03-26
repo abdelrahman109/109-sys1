@@ -2,7 +2,7 @@ from flask import render_template, redirect, url_for, flash, request, jsonify, B
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from .db import get_db
-from .helpers import format_currency, load_current_user
+from .helpers import format_currency
 import random
 import string
 from datetime import datetime, timedelta
@@ -17,17 +17,22 @@ def index():
     """الصفحة الرئيسية"""
     return render_template('index.html')
 
-@bp.route('/transparency')
-def transparency():
-    """صفحة الشفافية"""
-    return render_template('transparency.html')
-
 @bp.route('/martyrs')
 def martyrs():
     """صفحة الشهداء"""
     db = get_db(current_app)
     martyrs_list = db.execute('SELECT * FROM martyrs').fetchall()
     return render_template('martyrs.html', martyrs=martyrs_list)
+
+@bp.route('/donate')
+def donate():
+    """صفحة التبرع"""
+    return render_template('donate.html')
+
+@bp.route('/reports')
+def reports():
+    """صفحة التقارير العامة"""
+    return render_template('reports.html')
 
 # ==================== مسارات المصادقة ====================
 
@@ -47,7 +52,6 @@ def login():
         
         if user and check_password_hash(user['password'], password):
             # تسجيل الدخول
-            from flask_login import login_user
             from .models import User
             user_obj = User(user)
             login_user(user_obj, remember=remember)
@@ -86,7 +90,6 @@ def register():
         
         # تسجيل الدخول تلقائياً
         user = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
-        from flask_login import login_user
         from .models import User
         login_user(User(user))
         
@@ -107,6 +110,107 @@ def logout():
 def forgot_password():
     """صفحة نسيت كلمة السر"""
     return render_template('public/forgot_password.html')
+
+# ==================== مسارات المستخدم ====================
+
+@bp.route('/profile')
+@login_required
+def profile():
+    """الملف الشخصي"""
+    return render_template('profile.html', user=current_user)
+
+@bp.route('/my-donations')
+@login_required
+def my_donations():
+    """تبرعات المستخدم"""
+    db = get_db(current_app)
+    donations = db.execute(
+        'SELECT * FROM donations WHERE user_id = ? ORDER BY created_at DESC',
+        (current_user.id,)
+    ).fetchall()
+    return render_template('my_donations.html', donations=donations)
+
+@bp.route('/my-certificates')
+@login_required
+def my_certificates():
+    """شهادات المستخدم"""
+    db = get_db(current_app)
+    donations = db.execute(
+        'SELECT * FROM donations WHERE user_id = ? AND status = "approved"',
+        (current_user.id,)
+    ).fetchall()
+    return render_template('my_certificates.html', donations=donations)
+
+# ==================== مسارات الأدمن ====================
+
+@bp.route('/admin')
+@login_required
+def admin_dashboard():
+    """لوحة تحكم الأدمن"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    return render_template('admin/dashboard.html')
+
+@bp.route('/admin/transparency')
+@login_required
+def admin_transparency():
+    """صفحة الشفافية (للأدمن فقط)"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    return render_template('admin/transparency.html')
+
+@bp.route('/admin/users')
+@login_required
+def admin_users():
+    """إدارة المستخدمين"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    db = get_db(current_app)
+    users = db.execute('SELECT * FROM users').fetchall()
+    return render_template('admin/users.html', users=users)
+
+@bp.route('/admin/donations')
+@login_required
+def admin_donations():
+    """إدارة التبرعات"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    db = get_db(current_app)
+    donations = db.execute('SELECT * FROM donations ORDER BY created_at DESC').fetchall()
+    return render_template('admin/donations.html', donations=donations)
+
+@bp.route('/admin/expenses')
+@login_required
+def admin_expenses():
+    """إدارة المصاريف"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    return render_template('admin/expenses.html')
+
+@bp.route('/admin/martyrs')
+@login_required
+def admin_martyrs():
+    """إدارة الشهداء"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    db = get_db(current_app)
+    martyrs = db.execute('SELECT * FROM martyrs').fetchall()
+    return render_template('admin/martyrs.html', martyrs=martyrs)
+
+@bp.route('/admin/reports')
+@login_required
+def admin_reports():
+    """التقارير"""
+    if getattr(current_user, 'role', None) != 'admin':
+        flash('غير مصرح لك بالدخول', 'danger')
+        return redirect(url_for('auth.index'))
+    return render_template('admin/reports.html')
 
 # ==================== واجهات برمجية API ====================
 
@@ -137,6 +241,16 @@ def api_send_reset_code():
     
     reset_code = ''.join(random.choices(string.digits, k=6))
     expires_at = datetime.now() + timedelta(minutes=10)
+    
+    # إنشاء جدول reset_codes إذا لم يكن موجوداً
+    db.execute('''
+        CREATE TABLE IF NOT EXISTS reset_codes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            code TEXT NOT NULL,
+            expires_at TIMESTAMP NOT NULL
+        )
+    ''')
     
     # حذف أي كود سابق
     db.execute('DELETE FROM reset_codes WHERE user_id = ?', (user['id'],))
@@ -204,100 +318,3 @@ def api_stats():
         'expenses': 0,
         'martyrs': total_martyrs
     })
-
-# ==================== مسارات المستخدم ====================
-
-@bp.route('/profile')
-@login_required
-def profile():
-    """الملف الشخصي"""
-    return render_template('profile.html', user=current_user)
-
-@bp.route('/my-donations')
-@login_required
-def my_donations():
-    """تبرعات المستخدم"""
-    db = get_db(current_app)
-    donations = db.execute(
-        'SELECT * FROM donations WHERE user_id = ? ORDER BY created_at DESC',
-        (current_user.id,)
-    ).fetchall()
-    return render_template('my_donations.html', donations=donations)
-
-@bp.route('/my-certificates')
-@login_required
-def my_certificates():
-    """شهادات المستخدم"""
-    db = get_db(current_app)
-    donations = db.execute(
-        'SELECT * FROM donations WHERE user_id = ? AND status = "approved"',
-        (current_user.id,)
-    ).fetchall()
-    return render_template('my_certificates.html', donations=donations)
-
-@bp.route('/donate')
-def donate():
-    """صفحة التبرع"""
-    return render_template('donate.html')
-
-# ==================== مسارات الأدمن ====================
-
-@bp.route('/admin')
-@login_required
-def admin_dashboard():
-    """لوحة تحكم الأدمن"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    return render_template('admin/dashboard.html')
-
-@bp.route('/admin/users')
-@login_required
-def admin_users():
-    """إدارة المستخدمين"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    db = get_db(current_app)
-    users = db.execute('SELECT * FROM users').fetchall()
-    return render_template('admin/users.html', users=users)
-
-@bp.route('/admin/donations')
-@login_required
-def admin_donations():
-    """إدارة التبرعات"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    db = get_db(current_app)
-    donations = db.execute('SELECT * FROM donations ORDER BY created_at DESC').fetchall()
-    return render_template('admin/donations.html', donations=donations)
-
-@bp.route('/admin/expenses')
-@login_required
-def admin_expenses():
-    """إدارة المصاريف"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    return render_template('admin/expenses.html')
-
-@bp.route('/admin/martyrs')
-@login_required
-def admin_martyrs():
-    """إدارة الشهداء"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    db = get_db(current_app)
-    martyrs = db.execute('SELECT * FROM martyrs').fetchall()
-    return render_template('admin/martyrs.html', martyrs=martyrs)
-
-@bp.route('/admin/reports')
-@login_required
-def admin_reports():
-    """التقارير"""
-    if getattr(current_user, 'role', None) != 'admin':
-        flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
-    return render_template('admin/reports.html')
