@@ -15,7 +15,7 @@
                         <i class="fas fa-hand-holding-usd fa-3x text-primary mb-3"></i>
                         <h3>تقارير التبرعات</h3>
                         <p>عرض تقارير التبرعات بتنسيقات مختلفة</p>
-                        <div class="d-flex gap-2 justify-content-center">
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
                             <a href="{{ url_for('reports.donations_csv') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-file-csv"></i> CSV
                             </a>
@@ -33,7 +33,7 @@
                         <i class="fas fa-chart-line fa-3x text-primary mb-3"></i>
                         <h3>تقارير المصاريف</h3>
                         <p>عرض تقارير المصاريف بتنسيقات مختلفة</p>
-                        <div class="d-flex gap-2 justify-content-center">
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
                             <a href="{{ url_for('reports.expenses_csv') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-file-csv"></i> CSV
                             </a>
@@ -51,7 +51,7 @@
                         <i class="fas fa-star-of-life fa-3x text-primary mb-3"></i>
                         <h3>تقارير الشهداء</h3>
                         <p>عرض تقارير الشهداء بتنسيقات مختلفة</p>
-                        <div class="d-flex gap-2 justify-content-center">
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
                             <a href="{{ url_for('reports.martyrs_csv') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-file-csv"></i> CSV
                             </a>
@@ -103,6 +103,7 @@ fetch('/api/stats')
                 }
             }
         });
-    });
+    })
+    .catch(err => console.error('Error loading chart data:', err));
 </script>
 {% endblock %}
