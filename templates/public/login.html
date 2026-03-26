@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card narrow">
+  <h1>تسجيل الدخول</h1>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>رقم الموبايل<input name="phone" required></label>
+    <label>كلمة المرور<input name="password" type="password" required></label>
+    <button class="btn" type="submit">دخول</button>
+  </form>
+</div>
+{% endblock %}

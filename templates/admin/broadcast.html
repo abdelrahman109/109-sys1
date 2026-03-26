@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>الرسائل الجماعية</h1>
+<div class="card">
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label>العنوان<input name="title" required></label>
+    <label>الرسالة<textarea name="body" rows="5" required></textarea></label>
+    <button class="btn" type="submit">إرسال عبر تيليجرام</button>
+  </form>
+</div>
+<div class="card">
+  <table class="table">
+    <tr><th>العنوان</th><th>التاريخ</th><th>النجاح</th><th>المرسل</th></tr>
+    {% for row in history %}<tr><td>{{ row.title }}</td><td>{{ row.sent_at }}</td><td>{{ row.success_count }}/{{ row.recipient_count }}</td><td>{{ row.sender_name or '-' }}</td></tr>{% else %}<tr><td colspan="4">لا يوجد</td></tr>{% endfor %}
+  </table>
+</div>
+{% endblock %}

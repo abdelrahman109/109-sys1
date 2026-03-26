@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>سجل التبرعات</h1>
+<div class="stack">
+{% for donation in donations %}
+  <div class="card donation-card" {% if donation.expires_at and donation.status == 'pending_proof' %}data-expires-at="{{ donation.expires_at }}"{% endif %}>
+    <div class="row between wrap"><strong>{{ donation.donation_code }}</strong><span class="badge {{ donation.status }}">{{ donation.status }}</span></div>
+    <p>{{ donation.amount|egp }} - {{ donation.donation_type }} - {{ donation.payment_method }}</p>
+    <p>تاريخ الإنشاء: {{ donation.created_at }}</p>
+    {% if donation.cancel_reason %}<p>السبب: {{ donation.cancel_reason }}</p>{% endif %}
+    {% if donation.status == 'pending_proof' %}
+      <p class="countdown">الوقت المتبقي: <span class="timer">--:--</span></p>
+      <form method="post" action="{{ url_for('donations.upload_proof', donation_id=donation.id) }}" enctype="multipart/form-data" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="file" name="payment_proof" accept="image/*" required>
+        <button class="btn small" type="submit">رفع الإيصال</button>
+      </form>
+      <form method="post" action="{{ url_for('donations.cancel', donation_id=donation.id) }}" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input name="reason" placeholder="سبب الإلغاء">
+        <button class="btn danger small" type="submit">إلغاء</button>
+      </form>
+    {% elif donation.status == 'paid' %}
+      <a class="btn small" href="{{ url_for('certificates.donation_certificate', donation_id=donation.id) }}">تحميل شهادة التبرع PDF</a>
+    {% endif %}
+  </div>
+{% else %}
+  <div class="card">لا توجد عمليات</div>
+{% endfor %}
+</div>
+{% endblock %}

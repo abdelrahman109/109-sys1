@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>إدارة المستخدمين</h1>
+<form method="get" class="card inline-form">
+  <input name="q" value="{{ q }}" placeholder="بحث بالاسم أو الهاتف أو الدور">
+  <button class="btn small" type="submit">بحث</button>
+</form>
+<div class="card">
+  <table class="table">
+    <tr><th>الاسم</th><th>الهاتف</th><th>الكلية</th><th>الدور</th><th>نشط</th><th>موثق</th><th>إجراء</th></tr>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.full_name }}</td><td>{{ user.phone }}</td><td>{{ user.college_name or '-' }}</td><td>{{ user.role }}</td><td>{{ 'نعم' if user.is_active else 'لا' }}</td><td>{{ 'نعم' if user.is_verified else 'لا' }}</td>
+      <td>
+        <form method="post" action="{{ url_for('admin.update_user', user_id=user.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <select name="role">
+            <option value="donor" {% if user.role == 'donor' %}selected{% endif %}>donor</option>
+            {% for role in roles %}<option value="{{ role }}" {% if user.role == role %}selected{% endif %}>{{ role }}</option>{% endfor %}
+          </select>
+          <label><input type="checkbox" name="is_active" {% if user.is_active %}checked{% endif %}> نشط</label>
+          <label><input type="checkbox" name="is_verified" {% if user.is_verified %}checked{% endif %}> موثق</label>
+          <button class="btn small" type="submit">حفظ</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

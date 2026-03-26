@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>حالة النظام</h1>
+<div class="grid three">
+  <div class="card"><strong>{{ health.disk_total_gb }} GB</strong><span>إجمالي المساحة</span></div>
+  <div class="card"><strong>{{ health.disk_free_gb }} GB</strong><span>المتاح</span></div>
+  <div class="card"><strong>{{ 'مفعل' if health.telegram_enabled else 'غير مفعل' }}</strong><span>تليجرام</span></div>
+</div>
+<div class="card">
+  <p>آخر نسخة احتياطية: {{ health.latest_backup.created_at if health.latest_backup else 'لا يوجد' }}</p>
+  <p>{{ health.latest_backup.backup_path if health.latest_backup else '' }}</p>
+  <form method="post" action="{{ url_for('admin.system_backup') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn" type="submit">إنشاء نسخة احتياطية الآن</button>
+  </form>
+</div>
+{% endblock %}

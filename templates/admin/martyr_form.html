@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>{{ 'إضافة شهيد' if not martyr else 'تعديل شهيد' }}</h1>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" id="martyrForm" data-weapons-endpoint="{{ url_for('auth.weapons_api', college_id=0).replace('/0','/') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid three">
+      <label>الاسم الكامل<input name="full_name" value="{{ martyr.full_name if martyr else '' }}" required></label>
+      <label>الرتبة/الدرجة<input name="military_rank" value="{{ martyr.military_rank if martyr else '' }}"></label>
+      <label>المحافظة<input name="governorate" value="{{ martyr.governorate if martyr else '' }}"></label>
+      <label>الكلية
+        <select name="college_id" id="martyrCollegeSelect">
+          <option value="">اختر</option>
+          {% for item in colleges %}<option value="{{ item.id }}" {% if martyr and martyr.college_id == item.id %}selected{% endif %}>{{ item.name_ar }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>السلاح / التخصص
+        <select name="weapon_id" id="martyrWeaponSelect">
+          <option value="">اختر</option>
+          {% for item in weapons %}<option value="{{ item.id }}" {% if martyr and martyr.weapon_id == item.id %}selected{% endif %}>{{ item.name_ar }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>سلاح مخصص<input name="custom_weapon" value="{{ martyr.custom_weapon if martyr else '' }}"></label>
+      <label>تاريخ الميلاد<input type="date" name="birth_date" value="{{ martyr.birth_date if martyr else '' }}"></label>
+      <label>تاريخ الاستشهاد<input type="date" name="martyrdom_date" value="{{ martyr.martyrdom_date if martyr else '' }}"></label>
+      <label>السن عند الاستشهاد<input type="number" step="0.1" name="age_at_martyrdom" value="{{ martyr.age_at_martyrdom if martyr else '' }}"></label>
+      <label>الحالة الاجتماعية<input name="marital_status" value="{{ martyr.marital_status if martyr else '' }}"></label>
+      <label>عدد الأبناء الذكور<input type="number" name="sons_count" value="{{ martyr.sons_count if martyr else 0 }}"></label>
+      <label>عدد البنات<input type="number" name="daughters_count" value="{{ martyr.daughters_count if martyr else 0 }}"></label>
+      <label>إجمالي الأبناء<input type="number" name="children_count" value="{{ martyr.children_count if martyr else 0 }}"></label>
+      <label>عدد الإخوة<input type="number" name="brothers_count" value="{{ martyr.brothers_count if martyr else 0 }}"></label>
+      <label>عدد الأخوات<input type="number" name="sisters_count" value="{{ martyr.sisters_count if martyr else 0 }}"></label>
+      <label>رقم الوالد<input name="father_phone" value="{{ martyr.father_phone if martyr else '' }}"></label>
+      <label>رقم الوالدة<input name="mother_phone" value="{{ martyr.mother_phone if martyr else '' }}"></label>
+      <label>رقم إضافي<input name="alternate_phone" value="{{ martyr.alternate_phone if martyr else '' }}"></label>
+      <label>صاحب الرقم الإضافي<input name="alternate_phone_owner" value="{{ martyr.alternate_phone_owner if martyr else '' }}"></label>
+      <label>ولي الأمر/المتابع<input name="family_guardian_name" value="{{ martyr.family_guardian_name if martyr else '' }}"></label>
+      <label>رقم الأسرة<input name="family_phone" value="{{ martyr.family_phone if martyr else '' }}"></label>
+      <label>عنوان الأسرة<input name="family_address" value="{{ martyr.family_address if martyr else '' }}"></label>
+      <label>الاحتياج الشهري<input type="number" name="monthly_support_needed" value="{{ martyr.monthly_support_needed if martyr else 0 }}"></label>
+      <label>أولوية الدعم<select name="support_priority">{% for p in priorities %}<option value="{{ p }}" {% if martyr and martyr.support_priority == p %}selected{% endif %}>{{ p }}</option>{% endfor %}</select></label>
+      <label>وصف حالة الأسرة<input name="family_status" value="{{ martyr.family_status if martyr else '' }}"></label>
+      <label>صورة الشهيد<input type="file" name="image" accept="image/*"></label>
+      <label class="row"><input type="checkbox" name="urgent_need" {% if martyr and martyr.urgent_need %}checked{% endif %}> احتياج عاجل</label>
+      <label class="row"><input type="checkbox" name="is_active" {% if not martyr or martyr.is_active %}checked{% endif %}> سجل نشط</label>
+      <label class="full">ملاحظات<textarea name="notes">{{ martyr.notes if martyr else '' }}</textarea></label>
+    </div>
+    <button class="btn" type="submit">حفظ</button>
+  </form>
+</div>
+{% endblock %}

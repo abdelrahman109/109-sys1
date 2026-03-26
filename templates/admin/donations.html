@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>مراجعة التبرعات</h1>
+<form method="get" class="card grid five">
+  <input name="q" value="{{ filters.q }}" placeholder="بحث">
+  <select name="status"><option value="">كل الحالات</option>{% for s in ['pending_proof','pending_review','paid','rejected','expired','cancelled'] %}<option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>{% endfor %}</select>
+  <select name="donation_type"><option value="">كل الأنواع</option>{% for item in donation_types %}<option value="{{ item }}" {% if filters.donation_type == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+  <select name="payment_method"><option value="">كل طرق الدفع</option>{% for item in payment_methods %}<option value="{{ item }}" {% if filters.payment_method == item %}selected{% endif %}>{{ item }}</option>{% endfor %}</select>
+  <select name="college_id"><option value="">كل الكليات</option>{% for item in colleges %}<option value="{{ item.id }}" {% if filters.college_id == item.id|string %}selected{% endif %}>{{ item.name_ar }}</option>{% endfor %}</select>
+  <button class="btn small" type="submit">تصفية</button>
+</form>
+<div class="stack">
+  {% for row in donations %}
+  <div class="card">
+    <div class="row between wrap"><strong>{{ row.donation_code }}</strong><span class="badge {{ row.status }}">{{ row.status }}</span></div>
+    <p>{{ row.full_name }} - {{ row.phone }} - {{ row.college_name or '-' }}</p>
+    <p>{{ row.amount|egp }} - {{ row.donation_type }} - {{ row.payment_method }}</p>
+    <p>إيصال: {% if row.payment_proof_path %}<a target="_blank" href="/{{ row.payment_proof_path }}">عرض</a>{% else %}-{% endif %}</p>
+    {% if row.status == 'pending_review' %}
+      <div class="grid two">
+        <form method="post" action="{{ url_for('admin.approve_donation', donation_id=row.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input name="admin_notes" placeholder="ملاحظات داخلية">
+          <button class="btn small" type="submit">قبول</button>
+        </form>
+        <form method="post" action="{{ url_for('admin.reject_donation', donation_id=row.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input name="reason" placeholder="سبب الرفض" required>
+          <input name="admin_notes" placeholder="ملاحظات داخلية">
+          <button class="btn danger small" type="submit">رفض</button>
+        </form>
+      </div>
+    {% endif %}
+    {% if row.status == 'paid' %}<a class="btn small" href="{{ url_for('certificates.donation_certificate', donation_id=row.id) }}">تحميل الشهادة</a>{% endif %}
+  </div>
+  {% else %}
+  <div class="card">لا توجد بيانات</div>
+  {% endfor %}
+</div>
+{% endblock %}

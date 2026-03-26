@@ -1,0 +1,13 @@
+[Unit]
+Description=109 web app
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/109-sys
+ExecStart=/home/ubuntu/109-sys/scripts/run_gunicorn.sh
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

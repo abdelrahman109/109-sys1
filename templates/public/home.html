@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero card">
+  <h1>منصة إدارة تبرعات صندوق الدفعة 109</h1>
+  <p>تسجيل سريع، رفع إيصال، متابعة حالة التبرع، ولوحة إدارة مالية وتقارير وتشغيل جاهز.</p>
+  <div class="actions">
+    <a class="btn" href="{{ url_for('auth.register') }}">إنشاء حساب</a>
+    <a class="btn secondary" href="{{ url_for('auth.login') }}">تسجيل الدخول</a>
+  </div>
+</section>
+<section class="grid three">
+  <div class="card stat"><strong>{{ stats.donations_total|egp }}</strong><span>إجمالي التبرعات</span></div>
+  <div class="card stat"><strong>{{ stats.expenses_total|egp }}</strong><span>إجمالي المصاريف</span></div>
+  <div class="card stat"><strong>{{ stats.net_total|egp }}</strong><span>صافي الصندوق</span></div>
+</section>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Notification Logs</h1>
+<div class="card"><table class="table"><tr><th>الوقت</th><th>المستخدم</th><th>العنوان</th><th>الحالة</th><th>الخطأ</th></tr>{% for row in logs %}<tr><td>{{ row.created_at }}</td><td>{{ row.full_name or '-' }}</td><td>{{ row.subject or '-' }}</td><td>{{ row.status }}</td><td>{{ row.error_message or '' }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

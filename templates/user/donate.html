@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h1>تبرع جديد</h1>
+  <div class="notice">ارفع الإيصال خلال {{ expiry_minutes }} دقائق بعد إنشاء التبرع. التبرعات الخاصة بالأسر تُدار داخليًا من خلال الإدارة، لذلك لا يوجد اختيار لاسم شهيد بعينه.</div>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid two">
+      <label>المبلغ<input name="amount" type="number" min="1" required></label>
+      <label>نوع التبرع
+        <select name="donation_type" id="donationType" required>
+          {% for item in donation_types %}<option value="{{ item }}">{{ item }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>طريقة الدفع
+        <select name="payment_method" required>
+          {% for item in payment_methods %}<option value="{{ item }}">{{ item }}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+    <button class="btn" type="submit">إنشاء العملية</button>
+  </form>
+</div>
+<div class="grid three">
+  <div class="card"><h3>InstaPay</h3><p>{{ instapay_number }}</p><a href="{{ instapay_link }}" target="_blank">رابط الدفع</a></div>
+  <div class="card"><h3>محفظة إلكترونية</h3><p>فودافون كاش / أورنج كاش / اتصالات كاش / WE Pay</p></div>
+  <div class="card"><h3>تحويل بنكي</h3><p>{{ bank_account }}</p></div>
+</div>
+{% endblock %}

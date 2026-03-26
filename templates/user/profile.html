@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h1>ملفي الشخصي</h1>
+  <form method="post" id="profileForm" data-weapons-endpoint="{{ url_for('auth.weapons_api', college_id=0).replace('/0','/') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid two">
+      <label>الاسم الكامل<input name="full_name" value="{{ user.full_name }}" required></label>
+      <label>الكلية
+        <select name="college_id" id="profileCollegeSelect">
+          <option value="">اختر</option>
+          {% for college in colleges %}
+          <option value="{{ college.id }}" {% if college.id == selected_college %}selected{% endif %}>{{ college.name_ar }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>السلاح / التخصص
+        <select name="weapon_id" id="profileWeaponSelect" data-selected="{{ user.weapon_id or '' }}">
+          <option value="">اختر</option>
+          {% for weapon in weapons %}
+          <option value="{{ weapon.id }}" {% if user.weapon_id == weapon.id %}selected{% endif %}>{{ weapon.name_ar }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>سلاح مخصص<input name="custom_weapon" value="{{ user.custom_weapon or '' }}"></label>
+      <label><input type="checkbox" name="monthly_subscription" {% if user.monthly_subscription %}checked{% endif %}> تفعيل التبرع الشهري</label>
+      <label>قيمة التبرع الشهري<input name="monthly_amount" type="number" min="0" value="{{ user.monthly_amount or 0 }}"></label>
+    </div>
+    <button class="btn" type="submit">حفظ</button>
+  </form>
+</div>
+<div class="card">
+  <h2>ربط تيليجرام</h2>
+  <p>كود الربط الحالي: <strong>{{ user.telegram_link_code }}</strong></p>
+  {% if telegram_bot_username %}
+    <p><a target="_blank" href="https://t.me/{{ telegram_bot_username }}?start={{ user.telegram_link_code }}">ربط مباشر مع البوت</a></p>
+  {% else %}
+    <p>استخدم الأمر التالي داخل البوت: <code>/link {{ user.telegram_link_code }}</code></p>
+  {% endif %}
+  <form method="post" action="{{ url_for('users.regenerate_link') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <button class="btn secondary" type="submit">توليد كود جديد</button>
+  </form>
+</div>
+{% endblock %}

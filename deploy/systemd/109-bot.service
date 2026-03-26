@@ -1,0 +1,13 @@
+[Unit]
+Description=109 telegram bot
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/109-sys
+ExecStart=/home/ubuntu/109-sys/.venv/bin/python /home/ubuntu/109-sys/bot.py
+Restart=always
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

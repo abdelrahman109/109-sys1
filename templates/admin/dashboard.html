@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>لوحة الأدمن</h1>
+<div class="grid four">
+  <div class="card stat"><strong>{{ stats.donations_total|egp }}</strong><span>إجمالي التبرعات</span></div>
+  <div class="card stat"><strong>{{ stats.expenses_total|egp }}</strong><span>إجمالي المصاريف</span></div>
+  <div class="card stat"><strong>{{ stats.net_total|egp }}</strong><span>صافي الصندوق</span></div>
+  <div class="card stat"><strong>{{ stats.goal_percent }}%</strong><span>تحقيق الهدف</span></div>
+  <div class="card stat"><strong>{{ stats.pending_review }}</strong><span>تبرعات تنتظر مراجعة</span></div>
+  <div class="card stat"><strong>{{ stats.pending_expenses }}</strong><span>مصروفات تنتظر اعتماد</span></div>
+  <div class="card stat"><strong>{{ stats.martyrs_count }}</strong><span>سجلات الشهداء النشطة</span></div>
+  <div class="card stat"><strong>{{ stats.urgent_cases }}</strong><span>حالات عاجلة</span></div>
+</div>
+<div class="grid two">
+  <div class="card">
+    <h2>تبرعات بانتظار المراجعة</h2>
+    <table class="table"><tr><th>الكود</th><th>الاسم</th><th>المبلغ</th></tr>
+      {% for row in pending %}<tr><td>{{ row.donation_code }}</td><td>{{ row.full_name }}</td><td>{{ row.amount|egp }}</td></tr>{% else %}<tr><td colspan="3">لا يوجد</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="card">
+    <h2>مصروفات بانتظار الاعتماد</h2>
+    <table class="table"><tr><th>التاريخ</th><th>الفئة</th><th>المبلغ</th></tr>
+      {% for row in expenses %}<tr><td>{{ row.expense_date }}</td><td>{{ row.category }}</td><td>{{ row.amount|egp }}</td></tr>{% else %}<tr><td colspan="3">لا يوجد</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>
+<div class="grid two">
+  <div class="card">
+    <h2>أولوية أسر الشهداء</h2>
+    <table class="table"><tr><th>الاسم</th><th>الأولوية</th><th>إجمالي الدعم</th></tr>
+      {% for row in martyrs %}<tr><td><a href="{{ url_for('admin.martyr_detail', martyr_id=row.id) }}">{{ row.full_name }}</a></td><td>{{ row.support_priority }}</td><td>{{ row.support_total|egp }}</td></tr>{% else %}<tr><td colspan="3">لا يوجد</td></tr>{% endfor %}
+    </table>
+  </div>
+  <div class="card">
+    <h2>الصحة العامة</h2>
+    <p>قاعدة البيانات: {% if health.db_exists %}موجودة{% else %}غير متاحة{% endif %}</p>
+    <p>تليجرام: {% if health.telegram_enabled %}مفعل{% else %}غير مفعل{% endif %}</p>
+    <p>المساحة الحرة: {{ health.disk_free_gb }} GB</p>
+    <p>آخر Backup: {{ health.latest_backup.created_at if health.latest_backup else 'لا يوجد' }}</p>
+  </div>
+</div>
+{% endblock %}

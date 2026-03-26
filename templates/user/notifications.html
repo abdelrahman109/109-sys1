@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h1>إعدادات الإشعارات</h1>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid two">
+      <label>Telegram Chat ID<input name="telegram_chat_id" value="{{ prefs.telegram_chat_id or '' }}"></label>
+      <label>بداية الهدوء<input name="quiet_start" value="{{ prefs.quiet_start }}"></label>
+      <label>نهاية الهدوء<input name="quiet_end" value="{{ prefs.quiet_end }}"></label>
+      <label><input type="checkbox" name="notify_confirm" {% if prefs.notify_confirm %}checked{% endif %}> تأكيد التبرعات</label>
+      <label><input type="checkbox" name="notify_monthly" {% if prefs.notify_monthly %}checked{% endif %}> التذكير الشهري</label>
+      <label><input type="checkbox" name="notify_new_content" {% if prefs.notify_new_content %}checked{% endif %}> محتوى جديد</label>
+      <label><input type="checkbox" name="notify_ramadan" {% if prefs.notify_ramadan %}checked{% endif %}> رمضان</label>
+      <label><input type="checkbox" name="notify_admin" {% if prefs.notify_admin %}checked{% endif %}> رسائل الأدمن</label>
+    </div>
+    <button class="btn" type="submit">حفظ</button>
+  </form>
+  <hr>
+  <form method="post" action="{{ url_for('notifications.send_test_message') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="telegram_chat_id" value="{{ prefs.telegram_chat_id or '' }}">
+    <button class="btn secondary" type="submit">إرسال رسالة اختبار</button>
+  </form>
+</div>
+{% endblock %}

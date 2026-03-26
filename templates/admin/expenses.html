@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>إدارة المصاريف</h1>
+<div class="card">
+  <h2>إضافة مصروف</h2>
+  <form method="post" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid three">
+      <label>التاريخ<input type="date" name="expense_date" required></label>
+      <label>الفئة<select name="category">{% for item in categories %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select></label>
+      <label>المبلغ<input type="number" name="amount" min="1" required></label>
+      <label>طريقة الدفع<select name="payment_method">{% for item in payment_methods %}<option value="{{ item }}">{{ item }}</option>{% endfor %}</select></label>
+      <label>ربط بحالة شهيد (اختياري)<select name="martyr_id"><option value="">بدون ربط</option>{% for item in martyrs %}<option value="{{ item.id }}">{{ item.full_name }}</option>{% endfor %}</select></label>
+      <label>إيصال<input type="file" name="receipt" accept="image/*"></label>
+      <label class="full">الوصف<textarea name="description"></textarea></label>
+    </div>
+    <button class="btn" type="submit">إضافة</button>
+  </form>
+</div>
+<div class="card">
+  <p><a href="{{ url_for('reports.expenses_xlsx') }}">تصدير Excel</a> | <a href="{{ url_for('reports.expenses_csv') }}">CSV</a></p>
+  <table class="table">
+    <tr><th>التاريخ</th><th>الفئة</th><th>الحالة المرتبطة</th><th>المبلغ</th><th>الحالة</th><th>الإيصال</th><th>الإجراء</th></tr>
+    {% for row in expenses %}
+    <tr>
+      <td>{{ row.expense_date }}</td><td>{{ row.category }}</td><td>{{ row.martyr_name or '-' }}</td><td>{{ row.amount|egp }}</td><td>{{ row.status }}</td>
+      <td>{% if row.receipt_path %}<a target="_blank" href="/{{ row.receipt_path }}">عرض</a>{% else %}-{% endif %}</td>
+      <td>
+        {% if row.status == 'pending' %}
+          <form method="post" action="{{ url_for('admin.approve_expense', expense_id=row.id) }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="btn small" type="submit">اعتماد</button>
+          </form>
+          <form method="post" action="{{ url_for('admin.reject_expense', expense_id=row.id) }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <input name="reason" placeholder="سبب الرفض" required>
+            <button class="btn danger small" type="submit">رفض</button>
+          </form>
+        {% else %}{{ row.approved_by_name or row.rejection_reason or '-' }}{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

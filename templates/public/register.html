@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h1>إنشاء حساب جديد</h1>
+  <form method="post" id="registerForm" data-weapons-endpoint="{{ url_for('auth.weapons_api', college_id=0).replace('/0','/') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <div class="grid two">
+      <label>الاسم الكامل<input name="full_name" required></label>
+      <label>رقم الموبايل<input name="phone" required></label>
+      <label>كلمة المرور<input name="password" type="password" required></label>
+      <label>الكلية
+        <select name="college_id" id="collegeSelect" required>
+          {% for college in colleges %}
+          <option value="{{ college.id }}" {% if college.id == selected_college %}selected{% endif %}>{{ college.name_ar }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>السلاح/التخصص
+        <select name="weapon_id" id="weaponSelect" data-selected="{{ request.form.get('weapon_id', '') }}">
+          <option value="">اختر</option>
+          {% for weapon in weapons %}
+          <option value="{{ weapon.id }}">{{ weapon.name_ar }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>سلاح مخصص<input name="custom_weapon"></label>
+      <label><input type="checkbox" name="monthly_subscription"> تفعيل التبرع الشهري</label>
+      <label>قيمة التبرع الشهري<input name="monthly_amount" type="number" min="0"></label>
+    </div>
+    <button class="btn" type="submit">إنشاء الحساب</button>
+  </form>
+</div>
+{% endblock %}

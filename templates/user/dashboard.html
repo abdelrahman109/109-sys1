@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>مرحبًا {{ user.full_name }}</h1>
+<div class="grid four">
+  <div class="card stat"><strong>{{ stats.donations_total|egp }}</strong><span>إجمالي الصندوق</span></div>
+  <div class="card stat"><strong>{{ stats.net_total|egp }}</strong><span>الصافي</span></div>
+  <div class="card stat"><strong>{{ stats.goal_percent }}%</strong><span>نسبة الهدف</span></div>
+  <div class="card stat"><strong>{{ user.monthly_amount|default(0)|egp }}</strong><span>مساهمة شهرية</span></div>
+</div>
+<div class="card">
+  <h2>آخر تبرعاتك</h2>
+  <table class="table">
+    <tr><th>الكود</th><th>المبلغ</th><th>النوع</th><th>الحالة</th></tr>
+    {% for donation in donations %}
+    <tr><td>{{ donation.donation_code }}</td><td>{{ donation.amount|egp }}</td><td>{{ donation.donation_type }}</td><td>{{ donation.status }}</td></tr>
+    {% else %}
+    <tr><td colspan="4">لا توجد عمليات بعد</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

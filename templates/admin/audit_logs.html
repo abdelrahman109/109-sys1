@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Audit Logs</h1>
+<div class="card"><table class="table"><tr><th>الوقت</th><th>المستخدم</th><th>الإجراء</th><th>الكيان</th><th>التفاصيل</th></tr>{% for row in logs %}<tr><td>{{ row.created_at }}</td><td>{{ row.actor_name or '-' }}</td><td>{{ row.action }}</td><td>{{ row.entity_type }} #{{ row.entity_id or '' }}</td><td>{{ row.details or '' }}</td></tr>{% endfor %}</table></div>
+{% endblock %}

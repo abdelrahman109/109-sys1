@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>صفحة الشفافية</h1>
+<div class="grid four">
+  <div class="card stat"><strong>{{ stats.donations_total|egp }}</strong><span>إجمالي التبرعات</span></div>
+  <div class="card stat"><strong>{{ stats.expenses_total|egp }}</strong><span>إجمالي المصاريف</span></div>
+  <div class="card stat"><strong>{{ stats.net_total|egp }}</strong><span>صافي الصندوق</span></div>
+  <div class="card stat"><strong>{{ stats.goal_percent }}%</strong><span>نسبة تحقيق الهدف</span></div>
+</div>
+<div class="card">
+  <p>الهدف الحالي: <strong>{{ stats.goal_amount|egp }}</strong></p>
+  <p>عدد المتبرعين المؤكدين: <strong>{{ stats.donors_count }}</strong></p>
+  <p>آخر تحديث: <strong>{{ stats.last_updated }}</strong></p>
+</div>
+{% endblock %}

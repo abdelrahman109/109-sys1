@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row between wrap">
+  <h1>إدارة الشهداء والأسر</h1>
+  <a class="btn" href="{{ url_for('admin.martyr_create') }}">إضافة شهيد</a>
+</div>
+<form method="get" class="card grid five">
+  <input name="q" value="{{ filters.q }}" placeholder="بحث بالاسم أو الهاتف أو الملاحظات">
+  <select name="college_id"><option value="">كل الكليات</option>{% for item in colleges %}<option value="{{ item.id }}" {% if filters.college_id == item.id|string %}selected{% endif %}>{{ item.name_ar }}</option>{% endfor %}</select>
+  <select name="priority"><option value="">كل الأولويات</option>{% for p in priorities %}<option value="{{ p }}" {% if filters.priority == p %}selected{% endif %}>{{ p }}</option>{% endfor %}</select>
+  <select name="is_active"><option value="">كل الحالات</option><option value="1" {% if filters.is_active == '1' %}selected{% endif %}>نشط</option><option value="0" {% if filters.is_active == '0' %}selected{% endif %}>مؤرشف</option></select>
+  <button class="btn small" type="submit">تصفية</button>
+</form>
+<div class="grid two">
+  {% for row in martyrs %}
+  <div class="card">
+    <div class="row wrap">
+      {% if row.image_path %}<img class="avatar" src="/{{ row.image_path }}" alt="{{ row.full_name }}">{% else %}<div class="avatar placeholder">{{ row.full_name[:1] }}</div>{% endif %}
+      <div>
+        <h3><a href="{{ url_for('admin.martyr_detail', martyr_id=row.id) }}">{{ row.full_name }}</a></h3>
+        <p class="muted">{{ row.college_name or '-' }} / {{ row.weapon_name or row.custom_weapon or '-' }}</p>
+        <p>الأولوية: <span class="badge">{{ row.support_priority }}</span> {% if row.urgent_need %}<span class="badge rejected">عاجل</span>{% endif %}</p>
+        <p>إجمالي الدعم: {{ row.support_total|egp }} | عدد السجلات: {{ row.support_count }}</p>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="card">لا توجد بيانات</div>
+  {% endfor %}
+</div>
+{% endblock %}
