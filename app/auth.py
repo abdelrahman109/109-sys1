@@ -1,8 +1,8 @@
-from flask import render_template, redirect, url_for, flash, request, jsonify, Blueprint, g, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, current_app, g
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from .db import get_db
-from .helpers import format_currency
+from app.db import get_db
+from app.helpers import format_currency
 import random
 import string
 from datetime import datetime, timedelta
@@ -13,34 +13,34 @@ bp = Blueprint('auth', __name__)
 # ==================== الصفحات العامة ====================
 
 @bp.route('/')
-def index():
+def home():
     """الصفحة الرئيسية"""
-    return render_template('index.html')
+    return render_template('public/home.html')
 
 @bp.route('/martyrs')
 def martyrs():
     """صفحة الشهداء"""
     db = get_db(current_app)
-    martyrs_list = db.execute('SELECT * FROM martyrs').fetchall()
-    return render_template('martyrs.html', martyrs=martyrs_list)
+    martyrs_list = db.execute('SELECT * FROM martyrs ORDER BY martyrdom_date DESC').fetchall()
+    return render_template('public/martyrs.html', martyrs=martyrs_list)
 
 @bp.route('/donate')
 def donate():
     """صفحة التبرع"""
-    return render_template('donate.html')
+    return render_template('public/donate.html')
 
 @bp.route('/reports')
 def reports():
     """صفحة التقارير العامة"""
-    return render_template('reports.html')
+    return render_template('public/reports.html')
 
 # ==================== مسارات المصادقة ====================
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
     """تسجيل الدخول"""
-    if getattr(g, 'current_user', None) and g.current_user:
-        return redirect(url_for('auth.index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.home'))
     
     if request.method == 'POST':
         phone = request.form.get('phone')
@@ -51,12 +51,11 @@ def login():
         user = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
         
         if user and check_password_hash(user['password'], password):
-            # تسجيل الدخول
-            from .models import User
+            from app.models import User
             user_obj = User(user)
             login_user(user_obj, remember=remember)
             flash('تم تسجيل الدخول بنجاح', 'success')
-            return redirect(url_for('auth.index'))
+            return redirect(url_for('auth.home'))
         else:
             flash('رقم الهاتف أو كلمة المرور غير صحيحة', 'danger')
     
@@ -65,8 +64,8 @@ def login():
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
     """تسجيل حساب جديد"""
-    if getattr(g, 'current_user', None) and g.current_user:
-        return redirect(url_for('auth.index'))
+    if current_user.is_authenticated:
+        return redirect(url_for('auth.home'))
     
     if request.method == 'POST':
         full_name = request.form.get('full_name')
@@ -90,11 +89,11 @@ def register():
         
         # تسجيل الدخول تلقائياً
         user = db.execute('SELECT * FROM users WHERE phone = ?', (phone,)).fetchone()
-        from .models import User
+        from app.models import User
         login_user(User(user))
         
         flash('تم إنشاء الحساب بنجاح! مرحباً بك في نظام دعم الدفعة 109', 'success')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     
     return render_template('public/register.html')
 
@@ -104,7 +103,7 @@ def logout():
     """تسجيل الخروج"""
     logout_user()
     flash('تم تسجيل الخروج بنجاح', 'info')
-    return redirect(url_for('auth.index'))
+    return redirect(url_for('auth.home'))
 
 @bp.route('/forgot-password', methods=['GET'])
 def forgot_password():
@@ -147,27 +146,27 @@ def my_certificates():
 @login_required
 def admin_dashboard():
     """لوحة تحكم الأدمن"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     return render_template('admin/dashboard.html')
 
 @bp.route('/admin/transparency')
 @login_required
 def admin_transparency():
     """صفحة الشفافية (للأدمن فقط)"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     return render_template('admin/transparency.html')
 
 @bp.route('/admin/users')
 @login_required
 def admin_users():
     """إدارة المستخدمين"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     db = get_db(current_app)
     users = db.execute('SELECT * FROM users').fetchall()
     return render_template('admin/users.html', users=users)
@@ -176,9 +175,9 @@ def admin_users():
 @login_required
 def admin_donations():
     """إدارة التبرعات"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     db = get_db(current_app)
     donations = db.execute('SELECT * FROM donations ORDER BY created_at DESC').fetchall()
     return render_template('admin/donations.html', donations=donations)
@@ -187,18 +186,18 @@ def admin_donations():
 @login_required
 def admin_expenses():
     """إدارة المصاريف"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     return render_template('admin/expenses.html')
 
 @bp.route('/admin/martyrs')
 @login_required
 def admin_martyrs():
     """إدارة الشهداء"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     db = get_db(current_app)
     martyrs = db.execute('SELECT * FROM martyrs').fetchall()
     return render_template('admin/martyrs.html', martyrs=martyrs)
@@ -207,9 +206,9 @@ def admin_martyrs():
 @login_required
 def admin_reports():
     """التقارير"""
-    if getattr(current_user, 'role', None) != 'admin':
+    if current_user.role != 'admin':
         flash('غير مصرح لك بالدخول', 'danger')
-        return redirect(url_for('auth.index'))
+        return redirect(url_for('auth.home'))
     return render_template('admin/reports.html')
 
 # ==================== واجهات برمجية API ====================
@@ -310,11 +309,13 @@ def api_stats():
     """إحصائيات النظام"""
     db = get_db(current_app)
     total_users = db.execute('SELECT COUNT(*) as count FROM users').fetchone()['count']
+    total_donations = db.execute('SELECT SUM(amount) as total FROM donations WHERE status = "approved"').fetchone()['total'] or 0
+    total_expenses = db.execute('SELECT SUM(amount) as total FROM expenses WHERE status = "approved"').fetchone()['total'] or 0
     total_martyrs = db.execute('SELECT COUNT(*) as count FROM martyrs').fetchone()['count'] if db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='martyrs'").fetchone() else 0
     
     return jsonify({
         'users': total_users,
-        'donations': 0,
-        'expenses': 0,
+        'donations': float(total_donations),
+        'expenses': float(total_expenses),
         'martyrs': total_martyrs
     })
