@@ -1,6 +1,9 @@
 import os
 import logging
 import sqlite3
+import random
+import string
+from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import telebot
 from telebot.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
@@ -23,8 +26,9 @@ bot = telebot.TeleBot(TOKEN)
 # مسار قاعدة البيانات
 DB_PATH = os.path.join(os.path.dirname(__file__), 'instance', 'app.db')
 
-# قاموس لتتبع حالة المستخدمين أثناء التسجيل
+# قاموس لتتبع حالة المستخدمين أثناء التسجيل وتغيير كلمة السر
 user_registration_state = {}
+user_reset_state = {}
 
 # التأكد من وجود مجلد instance
 os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
@@ -51,13 +55,14 @@ def main_menu(user_id=None):
             logger.error(f"Database error in main_menu: {e}")
     
     if is_registered:
-        # قائمة المستخدم المسجل
+        # قائمة المستخدم المسجل (مضافة زر تغيير كلمة السر)
         btn1 = KeyboardButton("💰 تبرع")
         btn2 = KeyboardButton("📊 تقاريري")
         btn3 = KeyboardButton("👤 ملفي الشخصي")
         btn4 = KeyboardButton("📜 شهاداتي")
-        btn5 = KeyboardButton("🔗 ربط التيليجرام")
-        markup.add(btn1, btn2, btn3, btn4, btn5)
+        btn5 = KeyboardButton("🔑 تغيير كلمة السر")
+        btn6 = KeyboardButton("🔗 ربط التيليجرام")
+        markup.add(btn1, btn2, btn3, btn4, btn5, btn6)
     else:
         # قائمة الزائر
         btn1 = KeyboardButton("📝 تسجيل حساب")
@@ -100,6 +105,17 @@ def start_command(message):
                 is_active INTEGER DEFAULT 1
             )
         ''')
+        
+        # إنشاء جدول reset_codes لتخزين أكواد استرجاع كلمة السر
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS reset_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                code TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP NOT NULL
+            )
+        ''')
         conn.commit()
         
         # التحقق من وجود المستخدم
@@ -130,7 +146,8 @@ def start_command(message):
                 "هذا البوت يساعدك في:\n"
                 "• تقديم التبرعات\n"
                 "• متابعة تقاريرك\n"
-                "• استلام الشهادات\n\n"
+                "• استلام الشهادات\n"
+                "• تغيير كلمة السر\n\n"
                 "يبدو أنك غير مسجل بعد. اضغط الزر أدناه لتسجيل حسابك.",
                 parse_mode='Markdown',
                 reply_markup=markup
@@ -153,6 +170,7 @@ def help_command(message):
         "• تقديم تبرعات\n"
         "• عرض التقارير\n"
         "• تحميل شهادات التبرع\n"
+        "• تغيير كلمة السر\n"
         "• ربط حساب التيليجرام"
     )
     bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
@@ -173,6 +191,8 @@ def cancel_command(message):
     user_id = message.chat.id
     if user_id in user_registration_state:
         del user_registration_state[user_id]
+    if user_id in user_reset_state:
+        del user_reset_state[user_id]
     bot.send_message(
         user_id,
         "❌ تم إلغاء العملية.",
@@ -207,7 +227,7 @@ def reports_button(message):
         user_id,
         "📊 *تقاريري*\n\n"
         "لعرض تقاريرك، يرجى الدخول إلى:\n"
-        "http://34.205.237.226/reports\n\n"
+        "http://34.205.237.226/my-donations\n\n"
         "يمكنك هناك تحميل تقارير CSV, Excel, PDF.",
         parse_mode='Markdown'
     )
@@ -252,10 +272,122 @@ def certificates_button(message):
         user_id,
         "📜 *شهادات التبرع*\n\n"
         "لتحميل شهادات التبرع، يرجى الدخول إلى:\n"
-        "http://34.205.237.226/certificates\n\n"
+        "http://34.205.237.226/my-certificates\n\n"
         "جميع الشهادات متاحة بصيغة PDF.",
         parse_mode='Markdown'
     )
+
+@bot.message_handler(func=lambda message: message.text == "🔑 تغيير كلمة السر")
+def change_password_start(message):
+    """بدء عملية تغيير كلمة السر"""
+    user_id = message.chat.id
+    
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT id, full_name FROM users WHERE telegram_id = ?", (user_id,))
+        user = c.fetchone()
+        conn.close()
+        
+        if not user:
+            bot.send_message(
+                user_id,
+                "❌ أنت غير مسجل في النظام. اضغط /start للتسجيل أولاً",
+                reply_markup=main_menu(user_id)
+            )
+            return
+        
+        msg = bot.send_message(
+            user_id,
+            "🔑 *تغيير كلمة السر*\n\n"
+            "أدخل رقم هاتفك المسجل للتأكيد:",
+            parse_mode='Markdown',
+            reply_markup=cancel_markup()
+        )
+        bot.register_next_step_handler(msg, change_password_phone)
+    except Exception as e:
+        logger.error(f"Change password start error: {e}")
+        bot.send_message(user_id, f"❌ حدث خطأ: {e}")
+
+def change_password_phone(message):
+    """استقبال رقم الهاتف لتغيير كلمة السر"""
+    user_id = message.chat.id
+    
+    if message.text == "❌ إلغاء":
+        bot.send_message(user_id, "❌ تم إلغاء العملية.", reply_markup=main_menu(user_id))
+        return
+    
+    phone = message.text.strip()
+    
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("SELECT id, full_name FROM users WHERE phone = ? AND telegram_id = ?", (phone, user_id))
+        user = c.fetchone()
+        
+        if not user:
+            bot.send_message(
+                user_id,
+                "❌ رقم الهاتف غير صحيح أو غير مرتبط بحسابك",
+                reply_markup=main_menu(user_id)
+            )
+            conn.close()
+            return
+        
+        user_reset_state[user_id] = {'phone': phone, 'user_id': user[0]}
+        conn.close()
+        
+        msg = bot.send_message(
+            user_id,
+            "🔐 أدخل كلمة المرور الجديدة (6 أحرف على الأقل):",
+            reply_markup=cancel_markup()
+        )
+        bot.register_next_step_handler(msg, change_password_new)
+    except Exception as e:
+        logger.error(f"Change password phone error: {e}")
+        bot.send_message(user_id, f"❌ حدث خطأ: {e}")
+
+def change_password_new(message):
+    """استقبال كلمة المرور الجديدة وتحديثها"""
+    user_id = message.chat.id
+    
+    if message.text == "❌ إلغاء":
+        if user_id in user_reset_state:
+            del user_reset_state[user_id]
+        bot.send_message(user_id, "❌ تم إلغاء العملية.", reply_markup=main_menu(user_id))
+        return
+    
+    new_password = message.text.strip()
+    
+    if len(new_password) < 6:
+        msg = bot.send_message(
+            user_id,
+            "⚠️ كلمة المرور يجب أن تكون 6 أحرف على الأقل. حاول مرة أخرى:",
+            reply_markup=cancel_markup()
+        )
+        bot.register_next_step_handler(msg, change_password_new)
+        return
+    
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute("UPDATE users SET password = ? WHERE id = ?", (new_password, user_reset_state[user_id]['user_id']))
+        conn.commit()
+        conn.close()
+        
+        bot.send_message(
+            user_id,
+            "✅ *تم تغيير كلمة المرور بنجاح!*\n\n"
+            "يمكنك الآن استخدام كلمة المرور الجديدة لتسجيل الدخول إلى الموقع.",
+            parse_mode='Markdown',
+            reply_markup=main_menu(user_id)
+        )
+        
+        if user_id in user_reset_state:
+            del user_reset_state[user_id]
+    except Exception as e:
+        logger.error(f"Change password new error: {e}")
+        bot.send_message(user_id, f"❌ حدث خطأ: {e}")
 
 @bot.message_handler(func=lambda message: message.text == "🔗 ربط التيليجرام")
 def link_telegram_button(message):
@@ -334,9 +466,11 @@ def cancel_button(message):
     user_id = message.chat.id
     if user_id in user_registration_state:
         del user_registration_state[user_id]
+    if user_id in user_reset_state:
+        del user_reset_state[user_id]
     bot.send_message(user_id, "❌ تم الإلغاء.", reply_markup=main_menu(user_id))
 
-# ==================== عملية التسجيل الكاملة ====================
+# ==================== عملية التسجيل الكاملة (مع التحقق من الرقم) ====================
 
 def register_start(message):
     """بدء عملية التسجيل من البوت"""
@@ -382,7 +516,7 @@ def register_start(message):
         bot.send_message(user_id, f"❌ حدث خطأ: {e}")
 
 def register_phone(message):
-    """استقبال رقم الهاتف"""
+    """استقبال رقم الهاتف مع التحقق من عدم وجوده مسبقاً"""
     user_id = message.chat.id
     
     if message.text == "❌ إلغاء":
@@ -404,13 +538,20 @@ def register_phone(message):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute("SELECT id FROM users WHERE phone = ?", (phone,))
-        if c.fetchone():
+        c.execute("SELECT id, full_name FROM users WHERE phone = ?", (phone,))
+        existing_user = c.fetchone()
+        
+        if existing_user:
             conn.close()
             msg = bot.send_message(
                 user_id,
-                "⚠️ هذا الرقم مسجل مسبقاً. إذا كان حسابك، استخدم خيار 'ربط التيليجرام'.\n\n"
-                "أدخل رقم آخر:",
+                f"⚠️ *هذا الرقم مسجل مسبقاً*\n\n"
+                f"الاسم المرتبط بالرقم: {existing_user[1]}\n\n"
+                "إذا كان هذا حسابك، يمكنك:\n"
+                "• استخدام خيار 'ربط التيليجرام' لتوصيل حسابك\n"
+                "• أو تسجيل الدخول مباشرة من الموقع\n\n"
+                "أدخل رقم آخر للتسجيل الجديد:",
+                parse_mode='Markdown',
                 reply_markup=cancel_markup()
             )
             bot.register_next_step_handler(msg, register_phone)
@@ -486,6 +627,19 @@ def register_fullname(message):
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         
+        # التحقق مرة أخيرة من عدم وجود الرقم (للتأكيد)
+        c.execute("SELECT id FROM users WHERE phone = ?", (phone,))
+        if c.fetchone():
+            conn.close()
+            bot.send_message(
+                user_id,
+                "⚠️ عذراً، هذا الرقم تم تسجيله أثناء عملية التسجيل. يرجى البدء من جديد.",
+                reply_markup=main_menu(user_id)
+            )
+            if user_id in user_registration_state:
+                del user_registration_state[user_id]
+            return
+        
         # إدراج المستخدم الجديد
         c.execute("""
             INSERT INTO users (phone, password, full_name, telegram_id, role, created_at)
@@ -503,7 +657,8 @@ def register_fullname(message):
             "يمكنك الآن:\n"
             "• تقديم التبرعات\n"
             "• متابعة تقاريرك\n"
-            "• استلام الشهادات\n\n"
+            "• استلام الشهادات\n"
+            "• تغيير كلمة السر\n\n"
             "استخدم الأزرار أدناه للتنقل.",
             parse_mode='Markdown',
             reply_markup=main_menu(user_id)
@@ -531,6 +686,24 @@ def handle_register_callback(call):
     """معالجة الضغط على زر التسجيل"""
     register_start(call.message)
     bot.answer_callback_query(call.id)
+
+# ==================== دالة إرسال كود استرجاع كلمة السر ====================
+
+def send_reset_code_via_telegram(telegram_id, code):
+    """إرسال كود استرجاع كلمة السر عبر التيليجرام"""
+    try:
+        bot.send_message(
+            telegram_id,
+            f"🔐 *كود استرجاع كلمة السر*\n\n"
+            f"كود التحقق الخاص بك هو: `{code}`\n\n"
+            f"هذا الكود صالح لمدة 10 دقائق.\n"
+            f"إذا لم تطلب هذا الكود، يرجى تجاهل الرسالة.",
+            parse_mode='Markdown'
+        )
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send reset code via Telegram: {e}")
+        return False
 
 # ==================== تشغيل البوت ====================
 
