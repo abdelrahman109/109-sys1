@@ -3,157 +3,94 @@
 {% block title %}تسجيل حساب جديد - صندوق الدفعة 109{% endblock %}
 
 {% block content %}
-<div class="auth-container">
-    <div class="auth-card">
-        <h2>
-            <i class="fas fa-user-plus"></i>
-            إنشاء حساب جديد
-        </h2>
-        
-        <form method="POST" action="{{ url_for('auth.register') }}" data-validate="true" id="register-form">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            
-            <div class="form-group">
-                <label class="form-label" for="full_name">
-                    <i class="fas fa-user"></i> الاسم الكامل
-                </label>
-                <input type="text" 
-                       class="form-control" 
-                       id="full_name" 
-                       name="full_name" 
-                       placeholder="أدخل اسمك الثلاثي"
-                       required
-                       autocomplete="name">
-                <div class="invalid-feedback"></div>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0"><i class="fas fa-user-plus"></i> إنشاء حساب جديد</h4>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="phone">
-                    <i class="fas fa-phone-alt"></i> رقم الموبايل
-                </label>
-                <input type="tel" 
-                       class="form-control" 
-                       id="phone" 
-                       name="phone" 
-                       placeholder="مثال: 0123456789"
-                       required
-                       autocomplete="tel"
-                       pattern="^(010|011|012|015)[0-9]{8}$">
-                <div class="invalid-feedback">يرجى إدخال رقم موبايل مصري صحيح (010/011/012/015)</div>
-                <small class="form-text text-muted">سيتم استخدام هذا الرقم لتسجيل الدخول واسترجاع كلمة السر</small>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="password">
-                    <i class="fas fa-lock"></i> كلمة المرور
-                </label>
-                <input type="password" 
-                       class="form-control" 
-                       id="password" 
-                       name="password" 
-                       placeholder="أدخل كلمة المرور (6 أحرف على الأقل)"
-                       required
-                       minlength="6"
-                       autocomplete="new-password">
-                <div class="invalid-feedback">كلمة المرور يجب أن تكون 6 أحرف على الأقل</div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="confirm_password">
-                    <i class="fas fa-check-circle"></i> تأكيد كلمة المرور
-                </label>
-                <input type="password" 
-                       class="form-control" 
-                       id="confirm_password" 
-                       name="confirm_password" 
-                       placeholder="أعد إدخال كلمة المرور"
-                       required
-                       autocomplete="off">
-                <div class="invalid-feedback">كلمة المرور غير متطابقة</div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="college">
-                    <i class="fas fa-graduation-cap"></i> الكلية/القسم
-                </label>
-                <select class="form-control" id="college" name="college">
-                    <option value="">اختر الكلية</option>
-                    <option value="هندسة">هندسة</option>
-                    <option value="طب">طب</option>
-                    <option value="صيدلة">صيدلة</option>
-                    <option value="علوم">علوم</option>
-                    <option value="تجارة">تجارة</option>
-                    <option value="حقوق">حقوق</option>
-                    <option value="آداب">آداب</option>
-                    <option value="اخرى">أخرى</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label" for="specialization">
-                    <i class="fas fa-tag"></i> التخصص (اختياري)
-                </label>
-                <input type="text" 
-                       class="form-control" 
-                       id="specialization" 
-                       name="specialization" 
-                       placeholder="أدخل تخصصك">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-calendar-alt"></i> التبرع الشهري
-                </label>
-                <div class="d-flex gap-2 align-center" style="flex-wrap: wrap;">
-                    <label class="d-flex align-center gap-1">
-                        <input type="radio" name="monthly_donation" value="0" checked> لا أريد
-                    </label>
-                    <label class="d-flex align-center gap-1">
-                        <input type="radio" name="monthly_donation" value="50"> 50 ج.م
-                    </label>
-                    <label class="d-flex align-center gap-1">
-                        <input type="radio" name="monthly_donation" value="100"> 100 ج.م
-                    </label>
-                    <label class="d-flex align-center gap-1">
-                        <input type="radio" name="monthly_donation" value="200"> 200 ج.م
-                    </label>
-                    <label class="d-flex align-center gap-1">
-                        <input type="radio" name="monthly_donation" value="other"> مبلغ آخر
-                    </label>
+            <div class="card-body p-4">
+                <form method="POST" action="/register" id="register-form">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> الاسم الكامل
+                        </label>
+                        <input type="text" 
+                               name="full_name" 
+                               class="form-control" 
+                               placeholder="أدخل اسمك الثلاثي"
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-phone-alt"></i> رقم الموبايل
+                        </label>
+                        <input type="tel" 
+                               name="phone" 
+                               id="phone"
+                               class="form-control" 
+                               placeholder="مثال: 0123456789"
+                               pattern="^(010|011|012|015)[0-9]{8}$"
+                               required>
+                        <small class="text-muted">رقم مصري صحيح يبدأ بـ 010، 011، 012، أو 015</small>
+                        <div id="phone-feedback" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-lock"></i> كلمة المرور
+                        </label>
+                        <input type="password" 
+                               name="password" 
+                               id="password"
+                               class="form-control" 
+                               placeholder="6 أحرف على الأقل"
+                               minlength="6"
+                               required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">
+                            <i class="fas fa-check-circle"></i> تأكيد كلمة المرور
+                        </label>
+                        <input type="password" 
+                               name="confirm_password" 
+                               id="confirm_password"
+                               class="form-control" 
+                               placeholder="أعد إدخال كلمة المرور"
+                               required>
+                        <div id="password-feedback" class="invalid-feedback"></div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100 py-2">
+                        <i class="fas fa-user-plus"></i> إنشاء الحساب
+                    </button>
+                </form>
+                
+                <hr class="my-4">
+                
+                <div class="text-center">
+                    <p class="mb-0">لديك حساب بالفعل؟ <a href="/login" class="text-decoration-none">تسجيل الدخول</a></p>
+                    <p class="mt-2"><a href="/forgot-password" class="text-decoration-none">نسيت كلمة المرور؟</a></p>
                 </div>
-                <input type="number" 
-                       class="form-control mt-2" 
-                       id="custom_amount" 
-                       name="custom_amount" 
-                       placeholder="أدخل المبلغ (جنيه)"
-                       style="display: none;">
             </div>
-            
-            <button type="submit" class="btn btn-primary btn-block">
-                <i class="fas fa-user-plus"></i> إنشاء الحساب
-            </button>
-        </form>
-        
-        <div class="auth-footer">
-            <p>لديك حساب بالفعل؟ <a href="{{ url_for('auth.login') }}">تسجيل الدخول</a></p>
-            <p><a href="{{ url_for('auth.forgot_password') }}">نسيت كلمة المرور؟</a></p>
         </div>
     </div>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // التحقق من تطابق كلمة المرور
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirm_password');
+    const phoneInput = document.getElementById('phone');
+    let phoneCheckTimeout;
     
+    // التحقق من تطابق كلمة المرور
     function validatePasswordMatch() {
         if (password.value !== confirmPassword.value) {
             confirmPassword.classList.add('is-invalid');
-            const feedback = confirmPassword.nextElementSibling;
-            if (feedback && feedback.classList.contains('invalid-feedback')) {
-                feedback.textContent = 'كلمة المرور غير متطابقة';
-            }
+            document.getElementById('password-feedback').textContent = 'كلمة المرور غير متطابقة';
             return false;
         } else {
             confirmPassword.classList.remove('is-invalid');
@@ -164,10 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     password.addEventListener('input', validatePasswordMatch);
     confirmPassword.addEventListener('input', validatePasswordMatch);
     
-    // التحقق من رقم الهاتف فوراً
-    const phoneInput = document.getElementById('phone');
-    let phoneCheckTimeout;
-    
+    // التحقق من رقم الهاتف
     phoneInput.addEventListener('input', function() {
         clearTimeout(phoneCheckTimeout);
         const phone = this.value.trim();
@@ -180,19 +114,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     if (data.exists) {
                         phoneInput.classList.add('is-invalid');
-                        let feedback = phoneInput.nextElementSibling;
-                        if (!feedback || !feedback.classList.contains('invalid-feedback')) {
-                            feedback = document.createElement('div');
-                            feedback.className = 'invalid-feedback';
-                            phoneInput.parentNode.insertBefore(feedback, phoneInput.nextSibling);
-                        }
-                        feedback.textContent = '⚠️ هذا الرقم مسجل مسبقاً. يرجى استخدام رقم آخر أو تسجيل الدخول.';
+                        document.getElementById('phone-feedback').textContent = '⚠️ هذا الرقم مسجل مسبقاً. يرجى استخدام رقم آخر أو تسجيل الدخول.';
                     } else {
                         phoneInput.classList.remove('is-invalid');
-                        const feedback = phoneInput.nextElementSibling;
-                        if (feedback && feedback.classList.contains('invalid-feedback')) {
-                            feedback.remove();
-                        }
                     }
                 } catch (error) {
                     console.error('Error checking phone:', error);
@@ -201,28 +125,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // التعامل مع التبرع الشهري
-    const monthlyRadios = document.querySelectorAll('input[name="monthly_donation"]');
-    const customAmount = document.getElementById('custom_amount');
-    
-    monthlyRadios.forEach(radio => {
-        radio.addEventListener('change', function() {
-            if (this.value === 'other') {
-                customAmount.style.display = 'block';
-                customAmount.required = true;
-            } else {
-                customAmount.style.display = 'none';
-                customAmount.required = false;
-            }
-        });
-    });
-    
     // التحقق قبل الإرسال
     const form = document.getElementById('register-form');
     form.addEventListener('submit', async function(event) {
         if (!validatePasswordMatch()) {
             event.preventDefault();
-            showMessage('كلمة المرور غير متطابقة', 'danger');
+            alert('كلمة المرور غير متطابقة');
             return;
         }
         
@@ -233,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await response.json();
                 if (data.exists) {
                     event.preventDefault();
-                    showMessage('⚠️ هذا الرقم مسجل مسبقاً. يرجى استخدام رقم آخر أو تسجيل الدخول.', 'danger');
+                    alert('⚠️ هذا الرقم مسجل مسبقاً. يرجى استخدام رقم آخر أو تسجيل الدخول.');
                     return;
                 }
             } catch (error) {
