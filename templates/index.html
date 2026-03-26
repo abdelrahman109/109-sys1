@@ -1,18 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}الرئيسية - نظام دعم الدفعة 109{% endblock %}
+{% block title %}الرئيسية - صندوق الدفعة 109{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <div class="hero">
     <h1>صندوق دعم الدفعة 109</h1>
     <p>نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
-    <a href="/donate" class="btn btn-primary btn-lg">
-        <i class="fas fa-hand-holding-heart"></i> تبرع الآن
-    </a>
+    {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('donate') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-hand-holding-heart"></i> تبرع الآن
+        </a>
+    {% endif %}
 </div>
 
-<!-- Stats Section -->
+<!-- Stats Section - تظهر فقط للأدمن -->
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
 <div class="stats-grid">
     <div class="stat-card">
         <i class="fas fa-users"></i>
@@ -35,37 +38,62 @@
         <p>عدد الشهداء</p>
     </div>
 </div>
+{% endif %}
 
 <!-- Features Section -->
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-4 mb-4">
         <div class="card text-center">
             <i class="fas fa-hand-holding-heart fa-3x text-gradient mb-3"></i>
             <h3>تبرع الآن</h3>
             <p>ساهم في دعم الأسر المحتاجة والشهداء من خلال تبرعاتك</p>
-            <a href="/donate" class="btn btn-primary">تبرع</a>
+            <a href="{{ url_for('donate') }}" class="btn btn-primary">تبرع</a>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 mb-4">
         <div class="card text-center">
             <i class="fas fa-chart-line fa-3x text-gradient mb-3"></i>
             <h3>الشفافية</h3>
             <p>تابع إيرادات ومصاريف الصندوق بشكل شفاف ومباشر</p>
-            <a href="/transparency" class="btn btn-outline">عرض التقارير</a>
+            <a href="{{ url_for('transparency') }}" class="btn btn-outline">عرض التقارير</a>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-4 mb-4">
         <div class="card text-center">
             <i class="fas fa-star-of-life fa-3x text-gradient mb-3"></i>
             <h3>الشهداء</h3>
             <p>تعرف على أسماء وصور الشهداء ودعم أسرهم</p>
-            <a href="/martyrs" class="btn btn-outline">عرض الشهداء</a>
+            <a href="{{ url_for('martyrs') }}" class="btn btn-outline">عرض الشهداء</a>
         </div>
     </div>
 </div>
 
+<!-- رسالة للمستخدمين العاديين -->
+{% if current_user.is_authenticated and current_user.role != 'admin' %}
+<div class="card text-center mt-4">
+    <div class="card-header">
+        <i class="fas fa-info-circle"></i> مرحباً بك
+    </div>
+    <div class="card-body">
+        <p>يمكنك من خلال حسابك:</p>
+        <div class="d-flex justify-center gap-3 flex-wrap">
+            <a href="{{ url_for('my_donations') }}" class="btn btn-outline">
+                <i class="fas fa-donate"></i> تبرعاتي
+            </a>
+            <a href="{{ url_for('my_certificates') }}" class="btn btn-outline">
+                <i class="fas fa-certificate"></i> شهاداتي
+            </a>
+            <a href="{{ url_for('profile') }}" class="btn btn-outline">
+                <i class="fas fa-user"></i> ملفي الشخصي
+            </a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <script>
-// تحميل الإحصائيات
+// تحميل الإحصائيات (للأدمن فقط)
+{% if current_user.is_authenticated and current_user.role == 'admin' %}
 fetch('/api/stats')
     .then(res => res.json())
     .then(data => {
@@ -75,5 +103,6 @@ fetch('/api/stats')
         document.getElementById('total-martyrs').textContent = data.martyrs || 0;
     })
     .catch(err => console.error('Error loading stats:', err));
+{% endif %}
 </script>
 {% endblock %}
