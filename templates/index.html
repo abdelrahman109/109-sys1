@@ -52,18 +52,18 @@
     </div>
     <div class="col-md-4 mb-4">
         <div class="card text-center">
-            <i class="fas fa-chart-line fa-3x text-gradient mb-3"></i>
-            <h3>الشفافية</h3>
-            <p>تابع إيرادات ومصاريف الصندوق بشكل شفاف ومباشر</p>
-            <a href="/transparency" class="btn btn-outline">عرض التقارير</a>
-        </div>
-    </div>
-    <div class="col-md-4 mb-4">
-        <div class="card text-center">
             <i class="fas fa-star-of-life fa-3x text-gradient mb-3"></i>
             <h3>الشهداء</h3>
             <p>تعرف على أسماء وصور الشهداء ودعم أسرهم</p>
             <a href="/martyrs" class="btn btn-outline">عرض الشهداء</a>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card text-center">
+            <i class="fas fa-chart-line fa-3x text-gradient mb-3"></i>
+            <h3>التقارير</h3>
+            <p>عرض تقارير التبرعات والمصاريف</p>
+            <a href="/reports" class="btn btn-outline">عرض التقارير</a>
         </div>
     </div>
 </div>
@@ -98,8 +98,8 @@ fetch('/api/stats')
     .then(res => res.json())
     .then(data => {
         document.getElementById('total-users').textContent = data.users || 0;
-        document.getElementById('total-donations').textContent = (data.donations || 0).toLocaleString() + ' ج.م';
-        document.getElementById('total-expenses').textContent = (data.expenses || 0).toLocaleString() + ' ج.م';
+        document.getElementById('total-donations').textContent = formatCurrency(data.donations || 0);
+        document.getElementById('total-expenses').textContent = formatCurrency(data.expenses || 0);
         document.getElementById('total-martyrs').textContent = data.martyrs || 0;
     })
     .catch(err => console.error('Error loading stats:', err));
