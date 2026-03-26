@@ -11,6 +11,8 @@
             </div>
             <div class="card-body p-4">
                 <form method="POST" action="/register" id="register-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
                     <div class="mb-3">
                         <label class="form-label">
                             <i class="fas fa-user"></i> الاسم الكامل
@@ -86,7 +88,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const phoneInput = document.getElementById('phone');
     let phoneCheckTimeout;
     
-    // التحقق من تطابق كلمة المرور
     function validatePasswordMatch() {
         if (password.value !== confirmPassword.value) {
             confirmPassword.classList.add('is-invalid');
@@ -101,7 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
     password.addEventListener('input', validatePasswordMatch);
     confirmPassword.addEventListener('input', validatePasswordMatch);
     
-    // التحقق من رقم الهاتف
     phoneInput.addEventListener('input', function() {
         clearTimeout(phoneCheckTimeout);
         const phone = this.value.trim();
@@ -125,7 +125,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // التحقق قبل الإرسال
     const form = document.getElementById('register-form');
     form.addEventListener('submit', async function(event) {
         if (!validatePasswordMatch()) {
