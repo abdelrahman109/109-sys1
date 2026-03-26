@@ -351,3 +351,44 @@ def system_backup():
     notify_admins(current_app, f'تم إنشاء نسخة احتياطية جديدة\n{backup_path}', 'backup')
     flash('تم إنشاء النسخة الاحتياطية بنجاح', 'success')
     return redirect(url_for('admin.system_health'))
+
+@bp.route('/transparency')
+@login_required
+@role_required('super_admin', 'finance_admin')
+def transparency():
+    """صفحة الشفافية للأدمن فقط"""
+    return render_template('admin/transparency.html')
+
+
+@bp.route('/api/transparency-data')
+@login_required
+@role_required('super_admin', 'finance_admin')
+def api_transparency_data():
+    """API بيانات الشفافية"""
+    db = get_db(current_app)
+    
+    total_donations = db.execute('SELECT SUM(amount) as total FROM donations WHERE status = "approved"').fetchone()['total'] or 0
+    total_expenses = db.execute('SELECT SUM(amount) as total FROM expenses WHERE status = "approved"').fetchone()['total'] or 0
+    
+    donations = db.execute('''
+        SELECT d.*, u.full_name as user_name 
+        FROM donations d 
+        LEFT JOIN users u ON d.user_id = u.id 
+        WHERE d.status = "approved" 
+        ORDER BY d.created_at DESC 
+        LIMIT 20
+    ''').fetchall()
+    
+    expenses = db.execute('''
+        SELECT * FROM expenses 
+        WHERE status = "approved" 
+        ORDER BY created_at DESC 
+        LIMIT 20
+    ''').fetchall()
+    
+    return jsonify({
+        'total_donations': float(total_donations),
+        'total_expenses': float(total_expenses),
+        'donations': [dict(d) for d in donations],
+        'expenses': [dict(e) for e in expenses]
+    })
