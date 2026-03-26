@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from functools import wraps
 from flask import flash, redirect, session, url_for, g, current_app, request
 from flask_login import current_user, login_required as flask_login_required
-import sqlite3
 from werkzeug.utils import secure_filename
 import locale
 
@@ -146,4 +145,3 @@ def ensure_dir(path):
 
 def now_str():
     return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-EOF
