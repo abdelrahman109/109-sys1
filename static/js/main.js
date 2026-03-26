@@ -320,3 +320,142 @@ function enableAdminMode() {
 function disableAdminMode() {
     document.body.classList.remove('admin-mode');
 }
+// ==================== نظام دعم الدفعة 109 ====================
+
+document.addEventListener('DOMContentLoaded', function() {
+    // ==================== إخفاء التنبيهات تلقائياً ====================
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(function(alert) {
+        setTimeout(function() {
+            alert.style.transition = 'all 0.5s ease';
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateX(30px)';
+            setTimeout(function() {
+                if (alert.parentNode) alert.remove();
+            }, 500);
+        }, 5000);
+    });
+    
+    // ==================== التحقق من صحة النماذج ====================
+    const forms = document.querySelectorAll('form[data-validate="true"]');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(function(field) {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('is-invalid');
+                    
+                    let errorDiv = field.nextElementSibling;
+                    if (!errorDiv || !errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv = document.createElement('div');
+                        errorDiv.className = 'invalid-feedback';
+                        errorDiv.textContent = 'هذا الحقل مطلوب';
+                        field.parentNode.insertBefore(errorDiv, field.nextSibling);
+                    }
+                } else {
+                    field.classList.remove('is-invalid');
+                    const errorDiv = field.nextElementSibling;
+                    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+            
+            if (!isValid) {
+                event.preventDefault();
+                showMessage('يرجى تعبئة جميع الحقول المطلوبة', 'danger');
+            }
+        });
+        
+        form.querySelectorAll('[required]').forEach(function(field) {
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                    const errorDiv = this.nextElementSibling;
+                    if (errorDiv && errorDiv.classList.contains('invalid-feedback')) {
+                        errorDiv.remove();
+                    }
+                }
+            });
+        });
+    });
+    
+    console.log('✅ نظام دعم الدفعة 109 جاهز');
+});
+
+// ==================== دوال مساعدة ====================
+
+// عرض رسالة
+function showMessage(message, type = 'info', containerId = 'message-container') {
+    const container = document.getElementById(containerId);
+    if (container) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} fade-in-up`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'danger' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <span>${message}</span>
+            <button type="button" class="close" onclick="this.parentElement.remove()">&times;</button>
+        `;
+        container.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateX(30px)';
+            setTimeout(() => alert.remove(), 500);
+        }, 5000);
+    } else {
+        alert(message);
+    }
+}
+
+// تنسيق العملة
+function formatCurrency(amount) {
+    if (!amount && amount !== 0) return '0 ج.م';
+    return new Intl.NumberFormat('ar-EG', {
+        style: 'currency',
+        currency: 'EGP',
+        minimumFractionDigits: 2
+    }).format(amount);
+}
+
+// تنسيق التاريخ
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    return date.toLocaleDateString('ar-EG', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
+// التحقق من رقم الهاتف المصري
+function isValidPhone(phone) {
+    return /^(010|011|012|015)[0-9]{8}$/.test(phone);
+}
+
+// تأكيد الحذف
+function confirmDelete(message) {
+    return confirm(`⚠️ ${message || 'هل أنت متأكد من الحذف؟ هذا الإجراء لا يمكن التراجع عنه.'}`);
+}
+
+// تأكيد العملية
+function confirmAction(message) {
+    return confirm(`❓ ${message || 'هل أنت متأكد من تنفيذ هذا الإجراء؟'}`);
+}
+
+// التحقق من رقم الهاتف (API)
+async function checkPhoneExists(phone) {
+    try {
+        const response = await fetch(`/api/check-phone?phone=${encodeURIComponent(phone)}`);
+        const data = await response.json();
+        return data.exists;
+    } catch (error) {
+        console.error('Error checking phone:', error);
+        return false;
+    }
+}
