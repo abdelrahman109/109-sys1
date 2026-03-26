@@ -31,6 +31,18 @@ def create_app():
     init_db(app)
     seed_reference_data(app)
     seed_admin(app)
+    
+    # إنشاء جدول reset_codes
+    with app.app_context():
+        db = get_db(app)
+        db.execute('''
+            CREATE TABLE IF NOT EXISTS reset_codes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                code TEXT NOT NULL,
+                expires_at TIMESTAMP NOT NULL
+            )
+        ''')
 
     @app.before_request
     def _bootstrap():
@@ -64,117 +76,5 @@ def create_app():
         db = get_db(app)
         db.execute('SELECT 1').fetchone()
         return {'status': 'ok'}
-
-    # ==================== إضافة مسار API للتحقق من رقم الهاتف ====================
-    @app.route('/api/check-phone', methods=['GET'])
-    def api_check_phone():
-        from flask import request, jsonify
-        from .db import get_db
-        phone = request.args.get('phone')
-        if not phone:
-            return jsonify({'exists': False, 'error': 'Phone number required'}), 400
-        
-        db = get_db()
-        user = db.execute('SELECT id FROM users WHERE phone = ?', (phone,)).fetchone()
-        return jsonify({'exists': user is not None})
-
-    # ==================== إضافة مسار API لإرسال كود استرجاع كلمة السر ====================
-    @app.route('/api/send-reset-code', methods=['POST'])
-    def api_send_reset_code():
-        from flask import request, jsonify
-        from .db import get_db
-        import random
-        import string
-        from datetime import datetime, timedelta
-        
-        data = request.get_json()
-        phone = data.get('phone')
-        
-        if not phone:
-            return jsonify({'success': False, 'message': 'رقم الهاتف مطلوب'}), 400
-        
-        db = get_db()
-        user = db.execute('SELECT id, full_name FROM users WHERE phone = ?', (phone,)).fetchone()
-        if not user:
-            return jsonify({'success': False, 'message': 'لا يوجد حساب مسجل بهذا الرقم'}), 404
-        
-        reset_code = ''.join(random.choices(string.digits, k=6))
-        expires_at = datetime.now() + timedelta(minutes=10)
-        
-        # حذف أي كود سابق
-        db.execute('DELETE FROM reset_codes WHERE user_id = ?', (user['id'],))
-        
-        # حفظ الكود الجديد
-        db.execute(
-            'INSERT INTO reset_codes (user_id, code, expires_at) VALUES (?, ?, ?)',
-            (user['id'], reset_code, expires_at)
-        )
-        
-        # في الإنتاج، أرسل الكود عبر SMS أو Telegram
-        print(f"Reset code for {phone}: {reset_code}")
-        
-        return jsonify({'success': True, 'message': 'تم إرسال كود التحقق'})
-
-    # ==================== إضافة مسار API لإعادة تعيين كلمة السر ====================
-    @app.route('/api/reset-password', methods=['POST'])
-    def api_reset_password():
-        from flask import request, jsonify
-        from .db import get_db
-        from werkzeug.security import generate_password_hash
-        from datetime import datetime
-        
-        data = request.get_json()
-        phone = data.get('phone')
-        code = data.get('code')
-        new_password = data.get('new_password')
-        
-        if not all([phone, code, new_password]):
-            return jsonify({'success': False, 'message': 'جميع الحقول مطلوبة'}), 400
-        
-        if len(new_password) < 6:
-            return jsonify({'success': False, 'message': 'كلمة المرور يجب أن تكون 6 أحرف على الأقل'}), 400
-        
-        db = get_db()
-        user = db.execute('SELECT id FROM users WHERE phone = ?', (phone,)).fetchone()
-        if not user:
-            return jsonify({'success': False, 'message': 'لا يوجد حساب مسجل بهذا الرقم'}), 404
-        
-        reset_code = db.execute(
-            'SELECT * FROM reset_codes WHERE user_id = ? AND code = ?',
-            (user['id'], code)
-        ).fetchone()
-        
-        if not reset_code:
-            return jsonify({'success': False, 'message': 'كود التحقق غير صحيح'}), 400
-        
-        expires_at = datetime.fromisoformat(reset_code['expires_at'])
-        if expires_at < datetime.now():
-            return jsonify({'success': False, 'message': 'انتهت صلاحية الكود'}), 400
-        
-        # تحديث كلمة المرور
-        hashed_password = generate_password_hash(new_password)
-        db.execute('UPDATE users SET password = ? WHERE id = ?', (hashed_password, user['id']))
-        
-        # حذف الكود بعد الاستخدام
-        db.execute('DELETE FROM reset_codes WHERE id = ?', (reset_code['id'],))
-        
-        return jsonify({'success': True, 'message': 'تم تغيير كلمة المرور بنجاح'})
-
-    # ==================== إضافة مسار API للإحصائيات (للأدمن فقط) ====================
-    @app.route('/api/stats', methods=['GET'])
-    def api_stats():
-        from flask import jsonify
-        from .db import get_db
-        
-        db = get_db()
-        total_users = db.execute('SELECT COUNT(*) as count FROM users').fetchone()['count']
-        total_martyrs = db.execute('SELECT COUNT(*) as count FROM martyrs').fetchone()['count']
-        
-        return jsonify({
-            'users': total_users,
-            'donations': 0,
-            'expenses': 0,
-            'martyrs': total_martyrs
-        })
 
     return app
