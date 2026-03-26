@@ -1,7 +1,7 @@
+cat > ~/109-sys1/app/helpers.py << 'EOF'
 import os
 import re
 import uuid
-import hashlib
 import secrets
 from datetime import datetime, timedelta
 from functools import wraps
@@ -123,11 +123,9 @@ def secure_image_upload(file, upload_folder):
         return None, "نوع الملف غير مسموح"
     
     filename = secure_filename(file.filename)
-    # إضافة معرف فريد لتجنب تكرار الأسماء
     unique_name = f"{uuid.uuid4().hex}_{filename}"
     filepath = os.path.join(upload_folder, unique_name)
     
-    # التأكد من وجود المجلد
     os.makedirs(upload_folder, exist_ok=True)
     
     try:
@@ -169,3 +167,16 @@ def calculate_age(birth_date):
         return None
     today = datetime.now().date()
     return today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+
+# ==================== دوال إضافية مطلوبة ====================
+
+def ensure_dir(path):
+    """التأكد من وجود المجلد، وإنشاؤه إذا لم يكن موجوداً"""
+    if not os.path.exists(path):
+        os.makedirs(path)
+    return path
+
+def now_str():
+    """إرجاع الوقت الحالي كسلسلة نصية"""
+    return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+EOF
