@@ -8,7 +8,7 @@
     <h1>صندوق دعم الدفعة 109</h1>
     <p>نظام متكامل لإدارة التبرعات والدعم للأسر والشهداء</p>
     {% if not current_user.is_authenticated %}
-        <a href="{{ url_for('donate') }}" class="btn btn-primary btn-lg">
+        <a href="{{ url_for('public.donate') }}" class="btn btn-primary btn-lg">
             <i class="fas fa-hand-holding-heart"></i> تبرع الآن
         </a>
     {% endif %}
@@ -47,7 +47,7 @@
             <i class="fas fa-hand-holding-heart fa-3x text-gradient mb-3"></i>
             <h3>تبرع الآن</h3>
             <p>ساهم في دعم الأسر المحتاجة والشهداء من خلال تبرعاتك</p>
-            <a href="{{ url_for('donate') }}" class="btn btn-primary">تبرع</a>
+            <a href="{{ url_for('public.donate') }}" class="btn btn-primary">تبرع</a>
         </div>
     </div>
     <div class="col-md-4 mb-4">
@@ -55,7 +55,7 @@
             <i class="fas fa-chart-line fa-3x text-gradient mb-3"></i>
             <h3>الشفافية</h3>
             <p>تابع إيرادات ومصاريف الصندوق بشكل شفاف ومباشر</p>
-            <a href="{{ url_for('transparency') }}" class="btn btn-outline">عرض التقارير</a>
+            <a href="{{ url_for('public.transparency') }}" class="btn btn-outline">عرض التقارير</a>
         </div>
     </div>
     <div class="col-md-4 mb-4">
@@ -63,7 +63,7 @@
             <i class="fas fa-star-of-life fa-3x text-gradient mb-3"></i>
             <h3>الشهداء</h3>
             <p>تعرف على أسماء وصور الشهداء ودعم أسرهم</p>
-            <a href="{{ url_for('martyrs') }}" class="btn btn-outline">عرض الشهداء</a>
+            <a href="{{ url_for('public.martyrs') }}" class="btn btn-outline">عرض الشهداء</a>
         </div>
     </div>
 </div>
@@ -77,13 +77,13 @@
     <div class="card-body">
         <p>يمكنك من خلال حسابك:</p>
         <div class="d-flex justify-center gap-3 flex-wrap">
-            <a href="{{ url_for('my_donations') }}" class="btn btn-outline">
+            <a href="{{ url_for('user.my_donations') }}" class="btn btn-outline">
                 <i class="fas fa-donate"></i> تبرعاتي
             </a>
-            <a href="{{ url_for('my_certificates') }}" class="btn btn-outline">
+            <a href="{{ url_for('user.my_certificates') }}" class="btn btn-outline">
                 <i class="fas fa-certificate"></i> شهاداتي
             </a>
-            <a href="{{ url_for('profile') }}" class="btn btn-outline">
+            <a href="{{ url_for('user.profile') }}" class="btn btn-outline">
                 <i class="fas fa-user"></i> ملفي الشخصي
             </a>
         </div>
